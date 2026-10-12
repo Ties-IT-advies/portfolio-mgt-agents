@@ -8,8 +8,7 @@
 #
 # Deliberately offline and without `gh`: this is the only link that needs
 # no network, and a check that needs network doesn't belong in a local
-# `check`. The scenario -> issue -> PR links live in `pre-merge-review` and
-# in CI.
+# `check`. The issue -> PR link lives in CI (check-pr-issue-link.sh).
 #
 # No `eval`. This script reads text that isn't fully under its own control;
 # an ID that accidentally is a command must never execute anything.

@@ -1,61 +1,32 @@
-# Method — Git/GitHub Workflow
+# CLAUDE.md — portfolio-mgt-agents
 
-This project is developed from multiple computers. Follow this workflow in every session, regardless of which machine you're working on.
+Guidance for Claude Code sessions and Hall of Automata specialists working in this repo.
 
-Static copy of the shared workflow from [spec-driven-guardrails](https://github.com/TiesL/spec-driven-guardrails)'s `WORKFLOW.md`, last synced 2026-09-26. Other adopted projects normally symlink to that file directly, but a symlink resolves to a local absolute path — not portable outside the machine it was created on, and inappropriate for a public repo. If this drifts from the source, treat the source repo as canonical.
+## What this repo is
 
-## Branch strategy: GitHub Flow
+A specification-first repo for an agent-based portfolio governance system. Start with [`README.md`](README.md); it routes into the PRD, the Decision Log, the agent specifications and the templates. Decisions in [`docs/decisions/DECISION-LOG.md`](docs/decisions/DECISION-LOG.md) are binding unless a new entry supersedes them. Domain vocabulary (PID, PSA, DEC-XXX, Portfolio Board vs. Steering Group, governance tiers) is explained in [`CONTEXT.md`](CONTEXT.md).
 
-- `main` is always stable/working. **Never commit or push directly to `main`** — this is a workflow agreement, not a technically enforced rule (GitHub branch protection on private repos requires a paid plan).
-- All work happens on a short-lived branch from the current `main`, named after the issue it implements:
-  - `feature/<issue-number>-<kebab-case-description>` for new functionality/epics
-  - `fix/<issue-number>-<kebab-case-description>` for bug fixes (including trivial ones, such as documentation corrections)
-- **No request leads straight to development.** What's being built is specified in an issue first — see the `write-spec` skill for the epic/work-item templates. The branch name can't even be written without that issue's number. **This includes editing a tracked file at all, even a draft you plan to show before committing** — `git-guardrails`/the native `pre-commit` hook enforce the branch-naming and commit-on-main parts of this mechanically, but neither one sees an `Edit`/`Write` tool call (only `Bash`), so nothing mechanical stops the file itself from being changed before the issue and branch exist. "I'll draft it on `main` and ask before committing" is exactly the violation this rule rules out, not an exception to it — create the issue and branch first, then edit.
+## How work flows: the Hall of Automata
 
-## When starting a session
+Development runs through the Hall of Automata (org `Ties-IT-advies`, project board #1).
 
-1. `git fetch origin` (also happens automatically via a `SessionStart` hook, see `settings/session-hooks.json`).
-2. Check whether you're continuing existing work (existing feature branch) or starting something new.
-   - Existing work: `git checkout <branch> && git pull origin <branch>`.
-   - New work: create the issue first — `gh issue create` with the epic or work-item template (`templates/ISSUE_TEMPLATE/`, see `write-spec`) — then branch from its number: `git checkout main && git pull origin main && git checkout -b feature/<issue-number>-<name>` (or `fix/<issue-number>-<name>`).
-3. Review recent history for context: `git log --oneline -10` — especially useful if you're continuing on the other computer and want to see what's happened since last time.
+- **Issues.** Work is planned as OKR → KR → Item, using the issue templates in `.github/ISSUE_TEMPLATE/`. KRs are sub-issues of an OKR, Items are sub-issues of a KR. Only Items are dispatched to a specialist (`hall:<specialist>` label). Bug fixes and investigations can be dispatched directly, without an OKR.
+- **Sagas.** Initiative-sized work starts with a saga page in the [repo wiki](https://github.com/Ties-IT-advies/portfolio-mgt-agents/wiki). A dispatched Item links its open saga in its `saga:` field.
+- **Branches.** Specialists work on `hall/<specialist>/issue-<N>`, branched from `main`. Nothing is committed or pushed to `main` directly.
+- **Pull requests.** The PR body (not only a commit message) contains `Closes #<N>.` for the Item it delivers. GitHub only records that link from the PR title or body, and CI checks it.
+- **Review and merge.** Hall PRs are reviewed by the Hall (`/hall:review`). A PR with an LGTM verdict and a green `check` may be squash-merged automatically. PRs that don't come from the Hall are merged by a human.
 
-## During the work
+## CI gates
 
-- Commit logical steps on the feature branch.
-- Push regularly to `origin/<branch>` — never to `main`. This also happens automatically: a `SessionEnd` hook pushes the current branch when a session ends, with a guard that skips this when `main` happens to be checked out (extra safety net, since there's no branch protection — see below).
-- Commit messages carry no "Co-Authored-By" trailer — enforced via `attribution.commit: ""` in `settings/session-hooks.json`, not dependent on whether the executing session remembers to do so.
+`.github/workflows/ci.yml` runs on every PR and on every push to `main`. The `check` job is a required status check: a PR can't merge until it passes.
 
-## Wrapping up
+- **`./check`** runs everything that decides whether a change is good. Today that is `check-traceability.sh`; add lint, tests and build here as they come into being, rather than as separate CI steps.
+- **`check-traceability.sh`** keeps `PRD.md` and `TEST-SCENARIOS.md` consistent. Every ID heading (`F<n>`, `S<n>`) must be unique, and every token in a `**Covers:**` field must resolve to an existing heading. If you add or rename an F-ID or S-ID, update the other file in the same PR.
+- **`check-pr-issue-link.sh`** fails a PR that references no issue.
+- **`check-main-via-pr.sh`** flags any commit on `main` that didn't come from a PR.
 
-**Confirmation is required only before merge (step 4 below).** Committing, pushing, opening a PR, and running the review all proceed without asking — do not invent an extra approval checkpoint at any of those points, even right after being corrected on a different mistake. If something about the change is genuinely unclear, ask that specific question directly instead of adding a generic "approve to proceed?" gate.
+Run `./check` locally before opening a PR.
 
-1. Once the change is complete and tested (and, where applicable, manually verified): open a PR with `gh pr create`. If the PR refers to an issue (`Closes #N`), put that link in the **PR description itself**, not only in a commit message: GitHub populates `closingIssuesReferences` — the field that issue-linking checks actually test against — exclusively from the PR title/body. A commit with `Closes #N` does close the issue on a merge to `main`, but such a check won't see the link while the PR is still open.
-2. **Run the quality review immediately, in parallel with CI, not gated on CI being green** — don't ask whether to, don't wait to be asked, don't wait for CI first; see the `pre-merge-review` skill. The review's marker is pinned to the commit it reviewed, so a commit that lands afterward (a fixup, or a fix for a red CI) simply needs a fresh review, whenever it runs — nothing slips through unreviewed.
-3. Before asking for merge confirmation, know that CI has actually finished — the merge guard blocks the merge otherwise, and asking prematurely just costs a round trip. Don't poll `gh pr checks` on a short fixed interval — measured against this repo's own last 10 completed CI runs (`gh run list --json createdAt,updatedAt`), durations cluster at 5.5-8 minutes (one outlier at ~23min), so a 20s interval produces a dozen-plus "still pending" checks before CI ever finishes (issue #215). Run `./wait-for-ci.sh <pr-number>` instead of polling by hand (issue #265) — it waits 5 minutes before the first check, then every 1 minute until CI reaches a terminal state, and exits non-zero if anything failed. That interval is a documented agreement precisely so an agent can't quietly improvise a shorter one; encoding it in a script closes that gap the same way a prose-only rule can't.
-4. **Wait for TiesL's explicit confirmation** that the test succeeded and there's no regression, before merging. Never merge automatically without that confirmation.
-5. Then merge with `gh pr merge --squash --delete-branch` — this keeps the history on `main` clean and cleans up the branch (local and remote) immediately.
+## Changing templates
 
-## Routing table
-
-This file holds what every session needs. For everything else: the table below resolves every moved topic in a single jump.
-
-| Situation | Skill |
-|---|---|
-| Quality review before the merge | `pre-merge-review` |
-| Specifying work (PRD, test scenarios, issues), `Covers:` convention | `write-spec` |
-| Substantiation requirement | `adoption-registry` |
-| Adoption registry (tracking per project which changes apply) | `adoption-registry` |
-| `check`/`deploy` naming convention, CI | `check-convention` |
-| Deploy conditions per environment | `deploy-guards` |
-| Complexity, technical debt, refactoring | `refactoring-triggers` |
-| Test-first work: seams, red-before-green, anti-patterns | `tdd-seams` |
-| Diagnosing a bug: reproduction → hypotheses → regression test → fix | `diagnose-bug` |
-| Which model/reasoning effort to use for a pipeline stage | `model-choice` |
-| Setting up a new (related) project | `adopt-workflow` (user-level) |
-| Relentless, round-based requirement elicitation from Ties | `grilling` |
-| Decomposing a system into deep modules, not shallow components | `codebase-design` |
-
-## Why
-
-Without this agreement, conflicts arise and work from one computer can accidentally be overwritten by work from the other. There is no technical block against direct pushes to `main` — so follow this workflow deliberately, even when a direct push would technically succeed.
+The execution templates in `templates/` are what the agents assess against. When a template changes, update `templates/execution-templates.md` and record why in the Decision Log.

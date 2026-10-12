@@ -3,14 +3,3 @@
 .env
 node_modules/
 .claude/*.lock
-
-# claude-workflow: begin — managed block, do not edit by hand
-.claude/settings.json
-.claude/skills/
-# claude-workflow: end
-
-# CLAUDE.md deliberately NOT in the managed block above and NOT gitignored:
-# this repo is public, so CLAUDE.md is a tracked static copy of the shared
-# workflow, not a machine-local symlink (a symlink would leak a local
-# absolute path). adopt.sh doesn't know this — if it's ever re-run here,
-# check CLAUDE.md hasn't been silently converted back to a symlink.

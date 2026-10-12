@@ -13,8 +13,8 @@
 #
 # Requires gh + a token with read access; on GitHub Actions, GITHUB_TOKEN is
 # available for free. Deliberately not part of the local, offline `check` —
-# that's link 1 (check-traceability.sh). Links 2 and 3 need network and so
-# live here and in `pre-merge-review`'s gate.
+# that's link 1 (check-traceability.sh). Link 3 needs network and so
+# lives here, in CI.
 #
 # No fail-open here: this is the *hard* block precisely because GITHUB_TOKEN
 # is guaranteed on CI. If gh can't consult the PR, that's a real CI infra

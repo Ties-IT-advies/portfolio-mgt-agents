@@ -1,7 +1,7 @@
 # Project Idea Submission Template
 
-**Primary Roles:** Project Sponsor, Business Owner, Portfolio Manager
-**Phase:** Idea Gate (Pre-Submission)
+**Primary Roles:** Project Sponsor, Business Owner, Portfolio Manager  
+**Phase:** Idea Gate (Pre-Submission)  
 **Purpose:** Capture and present a project concept for portfolio board evaluation
 
 ---

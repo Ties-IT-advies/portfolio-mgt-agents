@@ -14,59 +14,59 @@ fields:
   - id: background
     section: body
     versions: [v9, v12]
-    guidance: Describe the background and reason for the project. What problem or opportunity is being addressed?
+    guidance: Names the problem or opportunity and its business context clearly; a symptom description alone is insufficient.
 
   - id: objective
     section: body
     versions: [v9, v12]
-    guidance: What is the project objective? How will success be measured?
+    guidance: States a clear project objective and at least one measurable success criterion; vague aims without a measure are insufficient.
 
   - id: sponsor
     section: body
     versions: [v9, v12]
-    guidance: Who is the (intended) project sponsor and ultimately responsible for this project?
+    guidance: Names an individual sponsor with organisational authority; a team name or 'TBD' without further detail is insufficient.
 
   - id: people_involved
     section: body
     versions: [v9, v12]
-    guidance: If known — who is the Project Manager? Which subject-matter experts are involved? Can a single content owner be named, and if so, who?
+    guidance: Names or describes the proposed Project Manager, at least one subject-matter expert, and a content owner where one can be assigned; 'TBD' throughout is insufficient.
 
   - id: costs
     section: body
     versions: [v9, v12]
-    guidance: What costs are associated with the project? Cover internal capacity, project costs including realization costs, maintenance costs, and where applicable, licence costs.
+    guidance: Provides an estimate or bandwidth for internal capacity and project costs covering realization and maintenance; names the main assumption. A bare 'TBD' is insufficient.
 
   - id: budget
     section: body
     versions: [v9, v12]
-    guidance: Is budget available for this project, and what is its source?
+    guidance: States whether budget is available and identifies the source or mechanism; 'no budget available' with a brief explanation is acceptable.
 
   - id: benefits
     section: body
     versions: [v9, v12]
-    guidance: What benefits will the project deliver and how can they be measured? Are there any disadvantages?
+    guidance: Identifies at least one measurable benefit and acknowledges potential downsides; a benefits list without any measure is insufficient.
 
   - id: timelines
     section: body
     versions: [v9, v12]
-    guidance: What is the intended timeline? What are the key milestones?
+    guidance: Gives a proposed start date or duration with at least one key milestone; flags confidence level where uncertain.
 
   - id: risks
     section: body
     versions: [v9, v12]
-    guidance: What are the key risks? What mitigation options exist? How will risks be managed during the project, and who is responsible?
+    guidance: Names at least three risks, each with a mitigation approach and an identified owner; a risk list without mitigation is insufficient.
 
   - id: strategic_contribution
     section: body
     versions: [v12]
-    guidance: Tick each strategic objective this project contributes to and add a brief explanation per ticked objective. The objective list lives in locales under fields.strategic_contribution.objectives.
+    guidance: At least one objective ticked with a brief but specific explanation of the contribution; ticking without explanation is insufficient.
 
   - id: departments_involved
     section: body
     versions: [v12]
-    guidance: Which departments are involved in or affected by this project?
+    guidance: Names all departments affected; must flag when more than one department is involved, as this affects project classification.
 
   - id: complexity
     section: body
     versions: [v12]
-    guidance: How complex is this project and why? Consider technical complexity, organisational complexity, and dependencies.
+    guidance: Rates overall complexity and briefly explains the main drivers (technical, organisational, or dependencies); 'low complexity' without reasoning is insufficient.

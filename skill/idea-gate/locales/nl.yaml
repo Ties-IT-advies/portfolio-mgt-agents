@@ -1,6 +1,5 @@
 # Dutch locale for Project Idea fields.
 # v9 guidance is verbatim from the source field table.
-# strategic_contribution.objectives are kept in English — no Dutch translation exists in the codebase.
 fields:
   prepared_by:
     label: "Opgemaakt door (Naam en functie)"
@@ -52,26 +51,26 @@ fields:
     guidance: "Vink de strategische doelstellingen aan waartoe dit project bijdraagt en geef per aangevinkte doelstelling een korte toelichting."
     objectives:
       strategic_performance:
-        label: "Strategic Performance"
+        label: "Strategische Prestaties"
         items:
-          - "Achieve and maintain market leadership in core business areas."
-          - "Develop and retain top talent and expertise."
-          - "Execute strategic vision effectively across the organization."
-          - "Build an integrated, aligned organization."
+          - "Bereik en behoud marktleiderschap in de kernactiviteiten."
+          - "Ontwikkel en behoud toptalent en expertise."
+          - "Voer de strategische visie effectief uit in de hele organisatie."
+          - "Bouw aan een geïntegreerde, afgestemde organisatie."
       revenue_growth:
-        label: "Revenue & Growth"
+        label: "Omzet & Groei"
         items:
-          - "Grow overall revenue and profitability."
-          - "Expand revenue streams and customer/market reach."
-          - "Create meaningful value and social impact."
-          - "Grow customer base and market presence."
+          - "Vergroot de totale omzet en winstgevendheid."
+          - "Breid inkomstenstromen en klant-/marktbereik uit."
+          - "Creëer betekenisvolle waarde en maatschappelijke impact."
+          - "Vergroot het klantenbestand en de marktpresentie."
       operational_excellence:
-        label: "Operational Excellence"
+        label: "Operationele Excellentie"
         items:
-          - "Maintain regulatory compliance and license to operate."
-          - "Achieve top-tier operational performance and quality."
-          - "Ensure sustainable and efficient operations."
-          - "Create positive stakeholder experience with high satisfaction metrics."
+          - "Handhaaf regelgevingsconformiteit en license to operate."
+          - "Bereik toonaangevende operationele prestaties en kwaliteit."
+          - "Zorg voor duurzame en efficiënte bedrijfsvoering."
+          - "Creëer een positieve stakeholderervaring met hoge tevredenheidsscores."
 
   departments_involved:
     label: "Betrokken afdelingen"

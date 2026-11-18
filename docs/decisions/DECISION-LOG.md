@@ -167,6 +167,30 @@ Splitting makes each template independently readable/editable/referenceable. Kee
 
 ---
 
+## Entry 6
+
+**Decision ID:** DEC-006
+**Topic:** Project Idea Template v12 — Field Registry, Locale Design, and Checklist Removal
+**Status:** Approved
+
+**Decision Made:**
+Promote the Project Idea Submission Template to v12 by adding three fields (`strategic_contribution`, `departments_involved`, `complexity`); establish `skill/idea-gate/fields.yaml` and `skill/idea-gate/locales/{en,nl}.yaml` as the single source of truth for all field metadata; rebuild the Markdown template to mirror the Word template field-for-field; drop the old checklist.
+
+**Rationale:**
+
+- **v12 fields.** Three fields absent from the v9 Word template were added per the Saga 1 Problem section: strategic contribution (connects the idea to the Strategic Assessment Framework), departments involved (required for classification when more than one department is affected), and complexity (supports early feasibility assessment). The 9 v9 fields are unchanged.
+- **Registry + locales.** `fields.yaml` lists every field with its id, section, versions, and English guidance. `locales/en.yaml` and `locales/nl.yaml` hold labels and guidance per language. Downstream work (assessment rubric, `.docx` fixtures, localization) reads from the registry — labels are never hard-coded elsewhere.
+- **"Mirrors" replaces "aligned with".** The Markdown template now matches the Word template field-for-field. This refines DEC-004's weaker claim that our template was "aligned with" ScripeConnect12's format.
+- **Checklist dropped.** The prior template used a reviewer checklist format, not a submitter form, and contained fields absent from the Word template. It was replaced because it modelled the wrong actor and misled anyone trying to use it as a fill-in document.
+- **v9 compatibility.** Fields tagged `[v9, v12]` exist in both versions; fields tagged `[v12]` are new. The system recognizes both.
+
+**Options Considered:**
+- Add three checklist items to the existing template — Denied (wrong actor model; misaligns with the Word template)
+- Add three fields directly to the Markdown template without a registry — Denied (downstream work would hard-code labels)
+- **Registry + locale design with v12 Markdown template rebuild — CHOSEN**
+
+---
+
 ## Open Items Carried Forward
 
 These are not yet decided and should be resolved before or during early development:

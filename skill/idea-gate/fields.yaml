@@ -1,0 +1,72 @@
+fields:
+  - id: prepared_by
+    section: header
+    versions: [v9, v12]
+
+  - id: date
+    section: header
+    versions: [v9, v12]
+
+  - id: status
+    section: header
+    versions: [v9, v12]
+
+  - id: background
+    section: body
+    versions: [v9, v12]
+    guidance: Names the problem or opportunity and its business context clearly; a symptom description alone is insufficient.
+
+  - id: objective
+    section: body
+    versions: [v9, v12]
+    guidance: States a clear project objective and at least one measurable success criterion; vague aims without a measure are insufficient.
+
+  - id: sponsor
+    section: body
+    versions: [v9, v12]
+    guidance: Names an individual sponsor with organisational authority; a team name or 'TBD' without further detail is insufficient.
+
+  - id: people_involved
+    section: body
+    versions: [v9, v12]
+    guidance: Names or describes the proposed Project Manager, at least one subject-matter expert, and a content owner where one can be assigned; 'TBD' throughout is insufficient.
+
+  - id: costs
+    section: body
+    versions: [v9, v12]
+    guidance: Provides an estimate or bandwidth for internal capacity and project costs covering realization and maintenance; names the main assumption. A bare 'TBD' is insufficient.
+
+  - id: budget
+    section: body
+    versions: [v9, v12]
+    guidance: States whether budget is available and identifies the source or mechanism; 'no budget available' with a brief explanation is acceptable.
+
+  - id: benefits
+    section: body
+    versions: [v9, v12]
+    guidance: Identifies at least one measurable benefit and acknowledges potential downsides; a benefits list without any measure is insufficient.
+
+  - id: timelines
+    section: body
+    versions: [v9, v12]
+    guidance: Gives a proposed start date or duration with at least one key milestone; flags confidence level where uncertain.
+
+  - id: risks
+    section: body
+    versions: [v9, v12]
+    guidance: Names at least three risks, each with a mitigation approach and an identified owner; a risk list without mitigation is insufficient.
+
+  - id: strategic_contribution
+    section: body
+    versions: [v12]
+    guidance: At least one objective ticked with a brief but specific explanation of the contribution; ticking without explanation is insufficient.
+
+  - id: departments_involved
+    section: body
+    versions: [v12]
+    guidance: Names all departments affected; must flag when more than one department is involved, as this affects project classification.
+
+  - id: complexity
+    section: body
+    versions: [v12]
+    guidance: Rates overall complexity and briefly explains the main drivers (technical, organisational, or dependencies); 'low complexity' without reasoning is insufficient.

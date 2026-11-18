@@ -1,0 +1,79 @@
+fields:
+  prepared_by:
+    label: "Prepared by (name and role)"
+
+  date:
+    label: "Date"
+
+  status:
+    label: "Status"
+
+  background:
+    label: "Background"
+    guidance: "Describe the background and reason for the project. What problem or opportunity is being addressed?"
+
+  objective:
+    label: "Objective"
+    guidance: "What is the project objective? How will success be measured?"
+
+  sponsor:
+    label: "(Intended) Project Sponsor"
+    guidance: "Who is the (intended) project sponsor and ultimately responsible for this project?"
+
+  people_involved:
+    label: "People involved"
+    guidance: "If known — who is the Project Manager? Which subject-matter experts are involved? Can a single content owner be named, and if so, who?"
+
+  costs:
+    label: "Costs (euros and capacity)"
+    guidance: "What costs are associated with the project? Cover internal capacity, project costs including realization costs, maintenance costs, and where applicable, licence costs."
+
+  budget:
+    label: "Budget"
+    guidance: "Is budget available for this project, and what is its source?"
+
+  benefits:
+    label: "Benefits"
+    guidance: "What benefits will the project deliver and how can they be measured? Are there any disadvantages?"
+
+  timelines:
+    label: "Timelines"
+    guidance: "What is the intended timeline? What are the key milestones?"
+
+  risks:
+    label: "Risks & mitigation"
+    guidance: "What are the key risks? What mitigation options exist? How will risks be managed during the project, and who is responsible?"
+
+  strategic_contribution:
+    label: "Strategic contribution"
+    guidance: "Tick each strategic objective this project contributes to and add a brief explanation per ticked objective."
+    objectives:
+      strategic_performance:
+        label: "Strategic Performance"
+        items:
+          - "Achieve and maintain market leadership in core business areas."
+          - "Develop and retain top talent and expertise."
+          - "Execute strategic vision effectively across the organization."
+          - "Build an integrated, aligned organization."
+      revenue_growth:
+        label: "Revenue & Growth"
+        items:
+          - "Grow overall revenue and profitability."
+          - "Expand revenue streams and customer/market reach."
+          - "Create meaningful value and social impact."
+          - "Grow customer base and market presence."
+      operational_excellence:
+        label: "Operational Excellence"
+        items:
+          - "Maintain regulatory compliance and license to operate."
+          - "Achieve top-tier operational performance and quality."
+          - "Ensure sustainable and efficient operations."
+          - "Create positive stakeholder experience with high satisfaction metrics."
+
+  departments_involved:
+    label: "Departments involved"
+    guidance: "Which departments are involved in or affected by this project?"
+
+  complexity:
+    label: "Complexity"
+    guidance: "How complex is this project and why? Consider technical complexity, organisational complexity, and dependencies."

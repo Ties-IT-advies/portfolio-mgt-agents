@@ -1,164 +1,105 @@
 # Project Idea Submission Template
 
-**Primary Roles:** Project Sponsor, Business Owner, Portfolio Manager  
-**Phase:** Idea Gate (Pre-Submission)  
+**Primary Roles:** Project Sponsor, Business Owner, Portfolio Manager
+**Phase:** Idea Gate (Pre-Submission)
 **Purpose:** Capture and present a project concept for portfolio board evaluation
 
 ---
 
-### Header Information
+## Header
 
-- **Project Name**: _______________________
-- **Submitter**: _______________________ (Name, Title, Department)
-- **Submission Date**: _______________________
-- **Project Sponsor (Opdrachtgever)**: _______________________
-- **Document Status**: [ ] Draft [ ] Ready for Review [ ] Submitted
+| Field | Value |
+|---|---|
+| **Prepared by (name and role)** *(Opgemaakt door — Naam en functie)* | |
+| **Date** *(Datum)* | |
+| **Status** *(Status)* | |
 
 ---
 
-### Project Definition
+## Background *(Achtergrond)*
 
-**Background / Rationale**
-- [ ] Problem or opportunity clearly described
-- [ ] Business context and urgency explained
-- [ ] Stakeholders affected identified
+Describe the background and reason for the project. What problem or opportunity is being addressed?
 
-Background & Rationale (2-3 sentences):
-_________________________________________________________________
-_________________________________________________________________
+---
 
-**Project Objective**
-- [ ] Objective is clear and measurable
-- [ ] Success criteria defined
-- [ ] How success will be measured identified
+## Objective *(Doelstelling)*
 
 What is the project objective? How will success be measured?
-_________________________________________________________________
-_________________________________________________________________
-
-**Intended Stakeholders**
-- [ ] End users/beneficiaries identified
-- [ ] Key stakeholders listed
-- [ ] User impact understood
-
-Who will benefit from this project?
-_________________________________________________________________
 
 ---
 
-### Team & Organization
+## (Intended) Project Sponsor *((Beoogd) Opdrachtgever)*
 
-**Project Sponsor (Opdrachtgever)**
-- [ ] Sponsor identified and committed
-- [ ] Sponsor contact information provided
-
-Who is the Project Sponsor and ultimate responsible party?
-_________________________________________________________________
-
-**Project Manager** (if known)
-- [ ] Project Manager identified
-- [ ] PM contact information provided
-
-Proposed Project Manager: _______________________
-
-**Key Stakeholders & Expertise**
-- [ ] Subject matter experts identified
-- [ ] Required competencies noted
-- [ ] Resource availability preliminary assessed
-
-Who are the key subject matter experts and content owners?
-_________________________________________________________________
+Who is the (intended) project sponsor and ultimately responsible for this project?
 
 ---
 
-### Business Case (Preliminary)
+## People involved *(Betrokkenen)*
 
-**Benefits / Value Proposition**
-- [ ] Benefits clearly articulated
-- [ ] Benefits are measurable
-- [ ] Business value quantified (if possible)
-
-What benefits will this project deliver and how will they be measured?
-_________________________________________________________________
-_________________________________________________________________
-
-**Costs (High-Level Estimate)**
-- [ ] Internal capacity estimated (FTE)
-- [ ] Project costs identified
-- [ ] Budget range provided with confidence level
-- [ ] Assumptions documented
-
-Estimated costs (euro and capacity):
-- Internal Capacity: _____ FTE (Confidence: [ ] High [ ] Medium [ ] Low)
-- Project Costs: € _____ (Confidence: [ ] High [ ] Medium [ ] Low)
-- Includes: [ ] Realization [ ] Maintenance [ ] Licenses [ ] External partners
-
-**Budget Availability**
-- [ ] Budget confirmed or identified
-- [ ] Funding source clarified
-- [ ] Financial constraints documented
-
-Is budget available for this project? Where does it come from?
-_________________________________________________________________
-
-**Timeline (High-Level)**
-- [ ] Proposed start date identified
-- [ ] Estimated duration provided
-- [ ] Key milestones sketched
-- [ ] Confidence in timeline assessed
-
-Proposed planning and key milestones:
-- Start Date: _______________________
-- Estimated Duration: _____ months (Confidence: [ ] High [ ] Medium [ ] Low)
-- Key Milestones: _________________________________________________________________
+If known — who is the Project Manager? Which subject-matter experts are involved? Can a single content owner be named, and if so, who?
 
 ---
 
-### Strategic & Risk Assessment
+## Costs (euros and capacity) *(Kosten (euro's en capaciteit))*
 
-**Strategic Alignment**
-- [ ] Strategic objective(s) identified
-- [ ] Contribution to strategy clear
-- [ ] Business case linked to organizational goals
-
-Which strategic objectives does this contribute to?
-_________________________________________________________________
-
-**Preliminary Risks & Mitigation**
-- [ ] Key risks identified (3-5 minimum)
-- [ ] Mitigation approaches sketched
-- [ ] Risk ownership assigned
-
-Key Risks:
-1. _________________________ → Mitigation: _________________________
-2. _________________________ → Mitigation: _________________________
-3. _________________________ → Mitigation: _________________________
-
-**Assumptions**
-- [ ] Key assumptions documented
-- [ ] Assumptions validated or flagged as uncertain
-
-Key Assumptions:
-1. _________________________________________________________________
-2. _________________________________________________________________
+What costs are associated with the project? Cover internal capacity, project costs including realization costs, maintenance costs, and where applicable, licence costs.
 
 ---
 
-### Portfolio Board Assessment
+## Budget *(Budget)*
 
-**Completeness Check**
-- [ ] All required sections completed
-- [ ] Submission is clear and professional
-- [ ] Strategic alignment demonstrated
-- [ ] Budget and timeline reasonable
+Is budget available for this project, and what is its source?
 
-**Initial Recommendation**
-- [ ] **APPROVED** — Ready for Definition phase
-- [ ] **APPROVED WITH CONDITIONS** — Conditions: _____________________
-- [ ] **NEEDS REWORK** — Specify: _________________________________
+---
 
-**Next Steps**
-- [ ] Assign Project Manager (if not already done)
-- [ ] Schedule Definition phase kick-off
-- [ ] Communicate approval to stakeholders
-- [ ] Archive decision and rationale
+## Benefits *(Baten)*
+
+What benefits will the project deliver and how can they be measured? Are there any disadvantages?
+
+---
+
+## Timelines *(Tijdslijnen)*
+
+What is the intended timeline? What are the key milestones?
+
+---
+
+## Risks & mitigation *(Risico's & mitigatie)*
+
+What are the key risks? What mitigation options exist? How will risks be managed during the project, and who is responsible?
+
+---
+
+## Strategic contribution *(Strategische bijdrage)*
+
+Tick each strategic objective this project contributes to and add a brief explanation per ticked objective.
+
+**Strategic Performance**
+- [ ] Achieve and maintain market leadership in core business areas.
+- [ ] Develop and retain top talent and expertise.
+- [ ] Execute strategic vision effectively across the organization.
+- [ ] Build an integrated, aligned organization.
+
+**Revenue & Growth**
+- [ ] Grow overall revenue and profitability.
+- [ ] Expand revenue streams and customer/market reach.
+- [ ] Create meaningful value and social impact.
+- [ ] Grow customer base and market presence.
+
+**Operational Excellence**
+- [ ] Maintain regulatory compliance and license to operate.
+- [ ] Achieve top-tier operational performance and quality.
+- [ ] Ensure sustainable and efficient operations.
+- [ ] Create positive stakeholder experience with high satisfaction metrics.
+
+---
+
+## Departments involved *(Betrokken afdelingen)*
+
+Which departments are involved in or affected by this project?
+
+---
+
+## Complexity *(Complexiteit)*
+
+How complex is this project and why? Consider technical complexity, organisational complexity, and dependencies.

@@ -1,0 +1,82 @@
+# Dutch locale for Project Idea fields.
+# v9 guidance is verbatim from the source field table.
+# strategic_contribution.objectives are kept in English — no Dutch translation exists in the codebase.
+fields:
+  prepared_by:
+    label: "Opgemaakt door (Naam en functie)"
+
+  date:
+    label: "Datum"
+
+  status:
+    label: "Status"
+
+  background:
+    label: "Achtergrond"
+    guidance: "Beschrijf de achtergrond en aanleiding voor het project"
+
+  objective:
+    label: "Doelstelling"
+    guidance: "Wat is de doelstelling voor het project? Hoe wordt gemeten of het succesvol is?"
+
+  sponsor:
+    label: "(Beoogd) Opdrachtgever"
+    guidance: "Wie is (beoogd) opdrachtgever en dus eindverantwoordelijk voor dit project?"
+
+  people_involved:
+    label: "Betrokkenen"
+    guidance: "Indien al bekend: Wie is Project Manager? Welke inhoudelijk experts zijn betrokken bij het project? Is het mogelijk om één inhoudelijk eindverantwoordelijke te benoemen, en zo ja, wie?"
+
+  costs:
+    label: "Kosten (euro's en capaciteit)"
+    guidance: "Welke kosten zijn aan het project verbonden? Beschrijf zowel de interne capaciteit als project kosten incl. realisatiekosten, onderhoudskosten, en wanneer van toepassing, licentiekosten"
+
+  budget:
+    label: "Budget"
+    guidance: "Is er budget beschikbaar voor het project en waar komt dit budget vandaan?"
+
+  benefits:
+    label: "Baten"
+    guidance: "Welke baten zal het project opleveren en hoe deze te meten? Zijn er nadelen verbonden aan het project?"
+
+  timelines:
+    label: "Tijdslijnen"
+    guidance: "Wat is de beoogde planning? Wat zijn belangrijke mijlpalen?"
+
+  risks:
+    label: "Risico's & mitigatie"
+    guidance: "Welke risico's zijn er? Wat zijn de mitigatiemogelijkheden? Hoe wordt hier op gestuurd tijdens het project? Wie is hiervoor verantwoordelijk?"
+
+  strategic_contribution:
+    label: "Strategische bijdrage"
+    guidance: "Vink de strategische doelstellingen aan waartoe dit project bijdraagt en geef per aangevinkte doelstelling een korte toelichting."
+    objectives:
+      strategic_performance:
+        label: "Strategic Performance"
+        items:
+          - "Achieve and maintain market leadership in core business areas."
+          - "Develop and retain top talent and expertise."
+          - "Execute strategic vision effectively across the organization."
+          - "Build an integrated, aligned organization."
+      revenue_growth:
+        label: "Revenue & Growth"
+        items:
+          - "Grow overall revenue and profitability."
+          - "Expand revenue streams and customer/market reach."
+          - "Create meaningful value and social impact."
+          - "Grow customer base and market presence."
+      operational_excellence:
+        label: "Operational Excellence"
+        items:
+          - "Maintain regulatory compliance and license to operate."
+          - "Achieve top-tier operational performance and quality."
+          - "Ensure sustainable and efficient operations."
+          - "Create positive stakeholder experience with high satisfaction metrics."
+
+  departments_involved:
+    label: "Betrokken afdelingen"
+    guidance: "Welke afdelingen zijn betrokken bij of worden beïnvloed door dit project?"
+
+  complexity:
+    label: "Complexiteit"
+    guidance: "Hoe complex is dit project en waarom? Denk hierbij aan technische complexiteit, organisatorische complexiteit en afhankelijkheden."

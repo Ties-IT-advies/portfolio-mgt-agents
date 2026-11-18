@@ -58,7 +58,7 @@ Nine primary and two supporting Markdown templates, one per governance artifact 
 
 Fifteen subsections, one per characteristic from the register in `nfr/`.
 **Answer each subsection with objective reasoning for *this* project — not
-with the generic assumption from `Standaard`.** "N/A because …" is a valid
+with the generic standard assumption (`Standaard`).** "N/A because …" is a valid
 answer, provided it's substantiated: the point is that the question is
 seriously asked and argued, not that every project must do equally much
 everywhere.

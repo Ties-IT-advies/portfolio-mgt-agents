@@ -46,7 +46,7 @@ This document describes the standard project lifecycle with six distinct phases,
 **Decision Maker:** Portfolio Board Preparation
 
 **Go/no-Go Criteria:**
-- Goedkeuring Concept (Concept Approval)
+- Concept Approval
 - Project Brief approval
 
 **Progression:** Approved concepts proceed to Design phase
@@ -70,7 +70,7 @@ This document describes the standard project lifecycle with six distinct phases,
 **Decision Maker:** Portfolio Board Preparation
 
 **Go/no-Go Criteria:**
-- Goedkeuring Definitieve Project Brief / Project Initiation Document (PID) Approval
+- Final Project Brief / Project Initiation Document (PID) Approval
 - Optional: Project Start Architecture V1.0 Review
 
 **Progression:** Approved projects move to Realization phase
@@ -120,7 +120,7 @@ This document describes the standard project lifecycle with six distinct phases,
 **Decision Maker:** Steering Group
 
 **Go/no-Go Criteria:**
-- Goedgekeurd verzoek tot livegang (Approved Go-Live Request)
+- Approved Go-Live Request
 - Steering Group approval required for proceeding
 
 **Progression:** Upon approval, system goes live; transition to Handover and Closure phase
@@ -197,4 +197,3 @@ This document describes the standard project lifecycle with six distinct phases,
 | Realization | Project Execution | Manage delivery under Steering Group oversight |
 | Go-Live | Project Execution | Manage transition under Steering Group approval |
 | Closure | Project Closure Advisor | Assess completion and approve closure |
-

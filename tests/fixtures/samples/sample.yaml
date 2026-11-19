@@ -1,0 +1,28 @@
+# Sample: strong — volledig ingevuld idee met maatstaven, individuele sponsor en drie gemitigeerde risico's.
+project_name: "Digitaal Klantportaal"
+header:
+  prepared_by: "J. de Vries, Projectleider"  # quality: strong
+  date: "2024-01-15"                          # quality: strong
+  status: "Concept"                           # quality: strong
+body:
+  background: "Klanten van Verbogen BV kunnen momenteel alleen telefonisch of per e-mail contact opnemen. Dit leidt tot lange wachttijden en hoge beheerlasten. Een digitaal klantportaal biedt zelfbediening en vermindert het aantal handmatige handelingen met ~40%."  # quality: strong
+  objective: "Het doel is een zelfbedieningsportaal live te hebben voor 500 klanten per Q3 2024. Succesmaatstaf: 80% van de standaard klantvragen afgehandeld zonder menselijke tussenkomst."  # quality: strong
+  sponsor: "M. Bakker, Directeur Klantbeleving"  # quality: strong
+  people_involved: "Project Manager: S. Jansen (IT). Inhoudelijk expert: R. Hoekstra (Klantenservice). Content owner: L. Smits (Marketing)."  # quality: strong
+  costs: "Interne capaciteit: 320 uur over 6 maanden (analist + developer). Projectkosten: €45.000 realisatie, €8.000/jaar onderhoud. Aanname: licentiekosten SaaS-platform €12.000/jaar."  # quality: strong
+  budget: "€57.000 beschikbaar vanuit het IT-innovatiefonds 2024. Goedkeuring directie ontvangen op 10-01-2024."  # quality: strong
+  benefits: "€30.000/jaar besparing op klantenservice FTE; NPS-verbetering verwacht van +8 punten. Nadeel: initiële weerstand bij medewerkers klantenservice (change management nodig)."  # quality: strong
+  timelines: "Start: februari 2024. Mijlpalen: prototype gereed april 2024, pilot 50 klanten mei 2024, go-live juli 2024. Vertrouwensniveau planning: gemiddeld (afhankelijk van leveranciersbeschikbaarheid)."  # quality: strong
+  risks: |-  # quality: strong
+    1. Leveranciersvertraging — mitigatie: contractuele deadline, alternatieve leverancier geïdentificeerd; eigenaar: S. Jansen.
+    2. Lage klantadoptie — mitigatie: communicatiecampagne + onboarding-tour; eigenaar: L. Smits.
+    3. Datastoring bij migratie klantgegevens — mitigatie: testmigratieronde + rollback-procedure; eigenaar: R. Hoekstra.
+  departments_involved: "IT, Klantenservice, Marketing. Meerdere afdelingen betrokken — projectclassificatie: cross-functioneel."  # quality: strong
+  complexity: "Inschatting: Gemiddeld. Technisch: standaard SaaS-integratie, beperkte maatwerk. Organisatorisch: drie afdelingen, change management vereist. Afhankelijkheden: leveranciersselectie nog niet afgerond."  # quality: strong
+strategic_picks:
+  - objective: operational_excellence
+    index: 3
+    explanation: ""  # quality: strong
+  - objective: revenue_growth
+    index: 3
+    explanation: ""  # quality: strong

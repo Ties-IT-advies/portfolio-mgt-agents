@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Everything that decides whether a change is good — see the
 # check-convention skill. CI calls this and invents no separate checks of
-# its own. This repo has no buildable code yet, so today this is just the
-# traceability check; add lint/tests/build here as they come into being.
+# its own. Add lint/tests/build here as they come into being.
 
 set -euo pipefail
 cd "$(dirname "$0")"
 
 ./check-traceability.sh .
+python skill/idea-gate/scripts/check_locales.py
+python -m pytest tests/ --tb=short -q

@@ -62,7 +62,7 @@ fields:
         items:
           - "Vergroot de totale omzet en winstgevendheid."
           - "Breid inkomstenstromen en klant-/marktbereik uit."
-          - "Creëer betekenisvolle waarde en maatschappelijke impact."
+          - "Creëeer betekenisvolle waarde en maatschappelijke impact."
           - "Vergroot het klantenbestand en de marktpositie."
       operational_excellence:
         label: "Operationele Excellentie"
@@ -70,7 +70,7 @@ fields:
           - "Voldoe aan wet- en regelgeving en licentie om te mogen opereren."
           - "Bereik toonaangevende operationele prestaties en kwaliteit."
           - "Zorg voor duurzame en efficiënte bedrijfsvoering."
-          - "Creëer een positieve stakeholderervaring met hoge tevredenheidsscores."
+          - "Creëeer een positieve stakeholderervaring met hoge tevredenheidsscores."
 
   departments_involved:
     label: "Betrokken afdelingen"
@@ -79,3 +79,16 @@ fields:
   complexity:
     label: "Complexiteit"
     guidance: "Hoe complex is dit project en waarom? Denk hierbij aan technische complexiteit, organisatorische complexiteit en afhankelijkheden."
+
+ratings:
+  sufficient: "Voldoende"
+  point_of_attention: "Aandachtspunt"
+  insufficient: "Onvoldoende"
+
+classification:
+  not_a_project: "Geen project"
+  normal_project: "Normaal project"
+  portfolio_project: "Portfolioproject"
+
+board_advice:
+  title: "Advies aan de Portfolio Board"

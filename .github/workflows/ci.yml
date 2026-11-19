@@ -32,10 +32,10 @@ jobs:
       issues: read
     steps:
       - uses: actions/checkout@v4
-      # No npm/setup-node step: this repo has no package.json, and `check`
-      # is a plain executable shell script, not an npm script. A project
-      # whose own `check` shells out to npm/another toolchain is
-      # responsible for making that available itself.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
       - run: ./check
       - name: PR references issue (link 3)
         if: github.event_name == 'pull_request'

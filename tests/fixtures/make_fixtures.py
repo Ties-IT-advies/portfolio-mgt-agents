@@ -69,11 +69,6 @@ SAMPLE_BODY = {
         "3. Datastoring bij migratie klantgegevens — mitigatie: testmigratieronde + "
         "rollback-procedure; eigenaar: R. Hoekstra."
     ),
-    "strategic_contribution": (
-        "[✓] Operationele Excellentie: Creëer een positieve stakeholderervaring met hoge "
-        "tevredenheidsscores.\n"
-        "[✓] Omzet & Groei: Vergroot het klantenbestand en de marktpositie."
-    ),
     "departments_involved": (
         "IT, Klantenservice, Marketing. "
         "Meerdere afdelingen betrokken — projectclassificatie: cross-functioneel."
@@ -85,6 +80,12 @@ SAMPLE_BODY = {
         "Afhankelijkheden: leveranciersselectie nog niet afgerond."
     ),
 }
+
+# (objective_key, item_index, free_text_explanation)
+SAMPLE_STRATEGIC_PICKS = [
+    ("operational_excellence", 3, ""),
+    ("revenue_growth", 3, ""),
+]
 
 
 def load_yaml(path):
@@ -119,6 +120,19 @@ def add_table(doc, rows):
         table.cell(i, 1).text = value
 
 
+def build_strategic_contribution(locale_fields, picks):
+    obj = locale_fields["strategic_contribution"]["objectives"]
+    lines = []
+    for key, idx, explanation in picks:
+        label = obj[key]["label"]
+        item = obj[key]["items"][idx]
+        line = f"[✓] {label}: {item}"
+        if explanation:
+            line += f" — {explanation}"
+        lines.append(line)
+    return "\n".join(lines)
+
+
 def build_document(registry, locale, project_name, header_values, body_values):
     header_fields = get_v12_fields(registry, "header")
     body_fields = get_v12_fields(registry, "body")
@@ -128,18 +142,23 @@ def build_document(registry, locale, project_name, header_values, body_values):
     header_rows = [(locale[f["id"]]["label"], header_values.get(f["id"], "")) for f in header_fields]
     add_table(doc, header_rows)
     doc.add_paragraph()
-    body_rows = [(locale[f["id"]]["label"], body_values.get(f["id"], "")) for f in body_fields]
+    body_rows = [
+        (locale[f["id"]]["label"], body_values.get(f["id"], locale[f["id"]].get("guidance", "")))
+        for f in body_fields
+    ]
     add_table(doc, body_rows)
     return doc
 
 
 def normalize_zip_timestamps(path):
-    """Rewrite the ZIP at path with all entry timestamps fixed to FIXED_ZIP_TIME."""
+    """Rewrite the ZIP at path with all entry metadata fixed for cross-platform determinism."""
     buf = io.BytesIO()
     with zipfile.ZipFile(path, "r") as src:
         with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as dst:
             for info in src.infolist():
                 info.date_time = FIXED_ZIP_TIME
+                info.create_system = 3  # Unix — fixed regardless of host OS
+                info.external_attr = 0o644 << 16
                 dst.writestr(info, src.read(info.filename))
     path.write_bytes(buf.getvalue())
 
@@ -156,7 +175,9 @@ def main():
     blank = build_document(registry, locale, "", {}, {})
     save_deterministic(blank, OUT_DIR / "idea-v12-blank.docx")
 
-    sample = build_document(registry, locale, SAMPLE_PROJECT_NAME, SAMPLE_HEADER, SAMPLE_BODY)
+    strategic_text = build_strategic_contribution(locale, SAMPLE_STRATEGIC_PICKS)
+    sample_body = {**SAMPLE_BODY, "strategic_contribution": strategic_text}
+    sample = build_document(registry, locale, SAMPLE_PROJECT_NAME, SAMPLE_HEADER, sample_body)
     save_deterministic(sample, OUT_DIR / "idea-v12-sample.docx")
 
     print("Generated idea-v12-blank.docx and idea-v12-sample.docx")

@@ -48,6 +48,25 @@ portfolio-management-agents/
     └── Portfolio Health Dashboard Template.md
 ```
 
+## Available Skills
+
+Skills are stored under `skill/` and symlinked into `.claude/skills/` so Claude
+Code discovers them when the repo is opened.
+
+| Skill | Trigger | Location |
+|-------|---------|----------|
+| `idea-gate` | Assess a Project Idea `.docx` | `skill/idea-gate/` |
+
+**Windows note:** the `.claude/skills/idea-gate` entry is a symlink. On Windows,
+enable Developer Mode (Settings → Developer → Developer Mode) or run your shell
+with administrator rights so that Git can materialise symlinks on checkout. On
+Linux and macOS this works without additional setup.
+
+To assess an idea document:
+1. Open this repo in Claude Code.
+2. Ask: *"Assess `<path/to/idea.docx>`"* — Claude Code will load the
+   `idea-gate` skill and walk through the procedure automatically.
+
 ## Validating Changes
 
 Run `./check` before committing — it's the single entry point for

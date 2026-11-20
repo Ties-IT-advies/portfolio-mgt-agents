@@ -1,0 +1,158 @@
+"""Evaluate the idea-gate skill on fixture .docx files.
+
+CLI: python run_eval.py [--fixture GLOB] [--runs N]
+Library: from run_eval import run_eval
+"""
+import argparse
+import importlib.util
+import json
+import subprocess
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+_REPO_ROOT = Path(__file__).parent.parent.parent.parent
+_DEFAULT_FIXTURE_GLOB = "tests/fixtures/*.docx"
+_EVAL_OUT_DIR = _REPO_ROOT / ".eval-out"
+
+
+def _load_validate():
+    spec = importlib.util.spec_from_file_location(
+        "validate_assessment",
+        Path(__file__).parent / "validate_assessment.py",
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.validate
+
+
+_validate = _load_validate()
+
+
+def default_runner(fixture_path: Path) -> tuple[dict, dict]:
+    """Call claude headless on fixture_path; return (assessment, answers)."""
+    result = subprocess.run(
+        ["claude", "-p", f"Assess {fixture_path}", "--output-format", "json"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"claude exited {result.returncode}: {result.stderr.strip()}"
+        )
+    stem = fixture_path.stem
+    assessment_path = fixture_path.parent / f"{stem}.assessment.json"
+    answers_path = fixture_path.parent / f"{stem}.answers.json"
+    if not assessment_path.exists():
+        raise RuntimeError(f"assessment file not written: {assessment_path.name}")
+    if not answers_path.exists():
+        raise RuntimeError(f"answers file not written: {answers_path.name}")
+    with assessment_path.open(encoding="utf-8") as f:
+        assessment = json.load(f)
+    with answers_path.open(encoding="utf-8") as f:
+        answers = json.load(f)
+    return assessment, answers
+
+
+def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
+    """Run the model once on fixture_path; return a result record."""
+    result = {
+        "fixture": fixture_path.name,
+        "run": run_index,
+        "passed": False,
+        "violations": [],
+    }
+    try:
+        assessment, answers = runner(fixture_path)
+        violations = _validate(assessment, answers)
+        result["passed"] = len(violations) == 0
+        result["violations"] = violations
+        tag = f"{fixture_path.stem}_run{run_index}"
+        (out_dir / f"{tag}.assessment.json").write_text(
+            json.dumps(assessment, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        (out_dir / f"{tag}.answers.json").write_text(
+            json.dumps(answers, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+    except Exception as exc:
+        result["error"] = str(exc)
+    return result
+
+
+def run_eval(
+    fixture_paths: list[Path],
+    runs: int,
+    runner=None,
+    out_dir: Path = None,
+) -> list[dict]:
+    """Run evaluation on fixture_paths; return list of result records."""
+    if runner is None:
+        runner = default_runner
+    if out_dir is None:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        out_dir = _EVAL_OUT_DIR / timestamp
+        out_dir.mkdir(parents=True, exist_ok=True)
+    results = []
+    for fixture_path in fixture_paths:
+        for run_index in range(1, runs + 1):
+            results.append(_run_one(fixture_path, run_index, out_dir, runner))
+    return results
+
+
+def _report(results: list[dict]) -> int:
+    """Print per-run result lines and V1 summary; return exit code."""
+    passed = 0
+    for r in results:
+        if r.get("error"):
+            line = f"ERROR: {r['error']}"
+        elif r["passed"]:
+            line = "PASS"
+            passed += 1
+        else:
+            n = len(r["violations"])
+            line = f"FAIL {n} violation{'s' if n != 1 else ''}"
+        print(f"{r['fixture']} (run {r['run']}): {line}")
+    total = len(results)
+    print(f"\nV1: {passed}/{total} fixtures valid")
+    return 0 if passed == total else 1
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Run idea-gate skill on fixtures and validate results."
+    )
+    parser.add_argument(
+        "--fixture",
+        default=_DEFAULT_FIXTURE_GLOB,
+        metavar="GLOB",
+        help="Glob relative to repo root (default: %(default)s)",
+    )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=1,
+        metavar="N",
+        help="Runs per fixture (default: %(default)s)",
+    )
+    args = parser.parse_args()
+
+    fixture_paths = sorted(_REPO_ROOT.glob(args.fixture))
+    if not fixture_paths:
+        print(f"No fixtures found for: {args.fixture}", file=sys.stderr)
+        return 1
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    out_dir = _EVAL_OUT_DIR / timestamp
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    results = run_eval(fixture_paths, args.runs, out_dir=out_dir)
+
+    (out_dir / "report.json").write_text(
+        json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+
+    return _report(results)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

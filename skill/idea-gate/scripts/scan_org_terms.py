@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import io
 import re
 import subprocess
 import sys
@@ -31,7 +32,12 @@ def build_pattern(terms: list[str]) -> re.Pattern:
 
 
 def _git(args: list[str]) -> str:
-    result = subprocess.run(["git"] + args, capture_output=True, text=True, check=False)
+    result = subprocess.run(["git"] + args, capture_output=True, text=True, check=True)
+    return result.stdout
+
+
+def _git_bytes(args: list[str]) -> bytes:
+    result = subprocess.run(["git"] + args, capture_output=True, check=True)
     return result.stdout
 
 
@@ -58,15 +64,36 @@ def get_changed_filenames(git_range: str) -> list[str]:
     return [f for f in _git(["diff", "--name-only", git_range]).splitlines() if f]
 
 
-def scan_push(git_range: str, pattern: re.Pattern) -> list[str]:
+def _scan_docx_content(doc, label: str, pattern: re.Pattern) -> list[str]:
     hits = []
-    for fname, lineno, content in parse_added_lines(git_range):
-        if pattern.search(content):
-            hits.append(f"{fname}:{lineno}: {content.rstrip()[:_MAX_LINE_DISPLAY]}")
-    for name in get_changed_filenames(git_range):
-        if pattern.search(name):
-            hits.append(f"[filename]: {name}")
+    for i, para in enumerate(doc.paragraphs, 1):
+        if para.text and pattern.search(para.text):
+            hits.append(f"{label}:paragraph {i}: {para.text[:_MAX_LINE_DISPLAY]}")
+    for t_idx, table in enumerate(doc.tables, 1):
+        for r_idx, row in enumerate(table.rows, 1):
+            for cell in row.cells:
+                for para in cell.paragraphs:
+                    if para.text and pattern.search(para.text):
+                        hits.append(f"{label}:table {t_idx} row {r_idx}: {para.text[:_MAX_LINE_DISPLAY]}")
     return hits
+
+
+def scan_docx_file(path: Path, pattern: re.Pattern) -> list[str]:
+    from docx import Document
+    try:
+        doc = Document(str(path))
+    except Exception:
+        return []
+    return _scan_docx_content(doc, str(path), pattern)
+
+
+def scan_docx_blob(blob: bytes, label: str, pattern: re.Pattern) -> list[str]:
+    from docx import Document
+    try:
+        doc = Document(io.BytesIO(blob))
+    except Exception:
+        return []
+    return _scan_docx_content(doc, label, pattern)
 
 
 def scan_text_file(path: Path, pattern: re.Pattern) -> list[str]:
@@ -78,19 +105,6 @@ def scan_text_file(path: Path, pattern: re.Pattern) -> list[str]:
     for i, line in enumerate(lines, 1):
         if pattern.search(line):
             hits.append(f"{path}:{i}: {line.rstrip()[:_MAX_LINE_DISPLAY]}")
-    return hits
-
-
-def scan_docx_file(path: Path, pattern: re.Pattern) -> list[str]:
-    from docx import Document
-    hits = []
-    try:
-        doc = Document(str(path))
-    except Exception:
-        return []
-    for i, para in enumerate(doc.paragraphs, 1):
-        if para.text and pattern.search(para.text):
-            hits.append(f"{path}:paragraph {i}: {para.text[:_MAX_LINE_DISPLAY]}")
     return hits
 
 
@@ -112,6 +126,24 @@ def scan_all(pattern: re.Pattern) -> list[str]:
     return hits
 
 
+def scan_push(git_range: str, pattern: re.Pattern) -> list[str]:
+    hits = []
+    for fname, lineno, content in parse_added_lines(git_range):
+        if pattern.search(content):
+            hits.append(f"{fname}:{lineno}: {content.rstrip()[:_MAX_LINE_DISPLAY]}")
+    head_sha = git_range.split("..")[-1]
+    for name in get_changed_filenames(git_range):
+        if pattern.search(name):
+            hits.append(f"[filename]: {name}")
+        if name.lower().endswith(".docx"):
+            try:
+                blob = _git_bytes(["show", f"{head_sha}:{name}"])
+            except subprocess.CalledProcessError:
+                continue  # deleted in this range
+            hits.extend(scan_docx_blob(blob, name, pattern))
+    return hits
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Scan for org terms from local denylist.")
     group = parser.add_mutually_exclusive_group(required=True)
@@ -129,7 +161,12 @@ def main(argv=None) -> int:
         return 0
     pattern = build_pattern(terms)
 
-    hits = scan_push(args.push, pattern) if args.push else scan_all(pattern)
+    try:
+        hits = scan_push(args.push, pattern) if args.push else scan_all(pattern)
+    except subprocess.CalledProcessError as exc:
+        print(f"Error: git command failed ({exc.returncode}) — push blocked for safety.", file=sys.stderr)
+        return 2
+
     for hit in hits:
         print(hit)
     return 1 if hits else 0

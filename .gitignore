@@ -3,3 +3,7 @@
 .env
 node_modules/
 .claude/*.lock
+calibration/
+*.local.yaml
+denylist.txt
+.portfolio-mgt-agents/

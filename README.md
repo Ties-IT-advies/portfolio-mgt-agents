@@ -58,6 +58,34 @@ command on every PR and on pushes to `main`, plus the two network-dependent
 traceability links (`check-pr-issue-link.sh`, `check-main-via-pr.sh`) —
 nothing separate is invented for CI.
 
+## Organization data
+
+Real organization data — your investment threshold, internal project names, calibration benchmarks, and sensitive terms — must never be committed to this repository. It lives in a local folder outside the repo.
+
+**Folder location**
+
+| Variable | Default |
+|---|---|
+| `$PMA_CONFIG_DIR` (if set) | `~/.portfolio-mgt-agents` |
+
+Copy `config.example.yaml` from the repo root to your local config folder as `config.yaml` and fill in real values.
+
+**Installing the pre-push hook**
+
+```bash
+bash scripts/install-hooks.sh
+```
+
+This sets `core.hooksPath` to `.githooks`. After installation, every `git push` scans added lines and filenames against `~/.portfolio-mgt-agents/denylist.txt` for any term you've listed there. If no denylist exists, the hook prints a warning and allows the push — contributors without a denylist are unblocked.
+
+**Scanning the full tree**
+
+```bash
+python skill/idea-gate/scripts/scan_org_terms.py --all
+```
+
+Scans every tracked file (including `.docx` content) and reports any match. Exit code is 1 if anything is found. Run this before merging to `main` as a final check.
+
 ## Key Constraints (do not violate without a new Decision Log entry)
 
 - **Strictly linear governance.** No phase-skipping, no exception paths. The only flexibility mechanism is looping back to an earlier phase. (DEC-002 REVISED)

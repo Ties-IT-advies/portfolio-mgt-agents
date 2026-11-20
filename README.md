@@ -105,6 +105,18 @@ python skill/idea-gate/scripts/scan_org_terms.py --all
 
 Scans every tracked file (including `.docx` content) and reports any match. Exit code is 1 if anything is found. Run this before merging to `main` as a final check.
 
+**CI gate**
+
+A server-side scan runs on every pull request and push to `main`, inside the `check` job (the required status check). It calls:
+
+```bash
+python skill/idea-gate/scripts/scan_org_terms.py --all --locations-only --denylist-env ORG_DENYLIST
+```
+
+To activate it, the Portfolio Manager adds the denylist as a repository secret — GitHub Settings → Secrets and variables → Actions → New repository secret → name: `ORG_DENYLIST`, value: one term per line, same format as the local file.
+
+The scan reports locations only (`<file>:<line>`) — matched terms never appear in the public log. Fork PRs do not receive the secret and therefore only warn; they will not fail the check.
+
 ## Key Constraints (do not violate without a new Decision Log entry)
 
 - **Strictly linear governance.** No phase-skipping, no exception paths. The only flexibility mechanism is looping back to an earlier phase. (DEC-002 REVISED)

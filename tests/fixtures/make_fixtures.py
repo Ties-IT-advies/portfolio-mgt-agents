@@ -13,79 +13,11 @@ REPO_ROOT = pathlib.Path(__file__).parent.parent.parent
 FIELDS_PATH = REPO_ROOT / "skill" / "idea-gate" / "fields.yaml"
 LOCALE_PATH = REPO_ROOT / "skill" / "idea-gate" / "locales" / "nl.yaml"
 OUT_DIR = pathlib.Path(__file__).parent
+SAMPLES_DIR = pathlib.Path(__file__).parent / "samples"
 
 FIXED_AUTHOR = "hall-of-automata"
 FIXED_DATE = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
 FIXED_ZIP_TIME = (2024, 1, 1, 0, 0, 0)
-
-SAMPLE_PROJECT_NAME = "Digitaal Klantportaal"
-
-SAMPLE_HEADER = {
-    "prepared_by": "J. de Vries, Projectleider",
-    "date": "2024-01-15",
-    "status": "Concept",
-}
-
-SAMPLE_BODY = {
-    "background": (
-        "Klanten van Verbogen BV kunnen momenteel alleen telefonisch of per e-mail contact "
-        "opnemen. Dit leidt tot lange wachttijden en hoge beheerlasten. Een digitaal klantportaal "
-        "biedt zelfbediening en vermindert het aantal handmatige handelingen met ~40%."
-    ),
-    "objective": (
-        "Het doel is een zelfbedieningsportaal live te hebben voor 500 klanten per Q3 2024. "
-        "Succesmaatstaf: 80% van de standaard klantvragen afgehandeld zonder menselijke tussenkomst."
-    ),
-    "sponsor": "M. Bakker, Directeur Klantbeleving",
-    "people_involved": (
-        "Project Manager: S. Jansen (IT). "
-        "Inhoudelijk expert: R. Hoekstra (Klantenservice). "
-        "Content owner: L. Smits (Marketing)."
-    ),
-    "costs": (
-        "Interne capaciteit: 320 uur over 6 maanden (analist + developer). "
-        "Projectkosten: €45.000 realisatie, €8.000/jaar onderhoud. "
-        "Aanname: licentiekosten SaaS-platform €12.000/jaar."
-    ),
-    "budget": (
-        "€57.000 beschikbaar vanuit het IT-innovatiefonds 2024. "
-        "Goedkeuring directie ontvangen op 10-01-2024."
-    ),
-    "benefits": (
-        "€30.000/jaar besparing op klantenservice FTE; "
-        "NPS-verbetering verwacht van +8 punten. "
-        "Nadeel: initiële weerstand bij medewerkers klantenservice (change management nodig)."
-    ),
-    "timelines": (
-        "Start: februari 2024. "
-        "Mijlpalen: prototype gereed april 2024, pilot 50 klanten mei 2024, go-live juli 2024. "
-        "Vertrouwensniveau planning: gemiddeld (afhankelijk van leveranciersbeschikbaarheid)."
-    ),
-    "risks": (
-        "1. Leveranciersvertraging — mitigatie: contractuele deadline, alternatieve leverancier "
-        "geïdentificeerd; eigenaar: S. Jansen.\n"
-        "2. Lage klantadoptie — mitigatie: communicatiecampagne + onboarding-tour; "
-        "eigenaar: L. Smits.\n"
-        "3. Datastoring bij migratie klantgegevens — mitigatie: testmigratieronde + "
-        "rollback-procedure; eigenaar: R. Hoekstra."
-    ),
-    "departments_involved": (
-        "IT, Klantenservice, Marketing. "
-        "Meerdere afdelingen betrokken — projectclassificatie: cross-functioneel."
-    ),
-    "complexity": (
-        "Inschatting: Gemiddeld. "
-        "Technisch: standaard SaaS-integratie, beperkte maatwerk. "
-        "Organisatorisch: drie afdelingen, change management vereist. "
-        "Afhankelijkheden: leveranciersselectie nog niet afgerond."
-    ),
-}
-
-# (objective_key, item_index, free_text_explanation)
-SAMPLE_STRATEGIC_PICKS = [
-    ("operational_excellence", 3, ""),
-    ("revenue_growth", 3, ""),
-]
 
 
 def load_yaml(path):
@@ -168,6 +100,23 @@ def save_deterministic(doc, path):
     normalize_zip_timestamps(path)
 
 
+def build_sample_document(registry, locale, sample):
+    picks = [
+        (p["objective"], p["index"], p.get("explanation", ""))
+        for p in sample.get("strategic_picks", [])
+    ]
+    strategic_text = build_strategic_contribution(locale, picks) if picks else ""
+    body = dict(sample.get("body", {}))
+    if strategic_text:
+        body["strategic_contribution"] = strategic_text
+    return build_document(
+        registry, locale,
+        sample.get("project_name", ""),
+        sample.get("header", {}),
+        body,
+    )
+
+
 def main():
     registry = load_yaml(FIELDS_PATH)["fields"]
     locale = load_yaml(LOCALE_PATH)["fields"]
@@ -175,12 +124,15 @@ def main():
     blank = build_document(registry, locale, "", {}, {})
     save_deterministic(blank, OUT_DIR / "idea-v12-blank.docx")
 
-    strategic_text = build_strategic_contribution(locale, SAMPLE_STRATEGIC_PICKS)
-    sample_body = {**SAMPLE_BODY, "strategic_contribution": strategic_text}
-    sample = build_document(registry, locale, SAMPLE_PROJECT_NAME, SAMPLE_HEADER, sample_body)
-    save_deterministic(sample, OUT_DIR / "idea-v12-sample.docx")
+    generated = ["idea-v12-blank.docx"]
+    for sample_path in sorted(SAMPLES_DIR.glob("*.yaml")):
+        sample = load_yaml(sample_path)
+        doc = build_sample_document(registry, locale, sample)
+        out_name = f"idea-v12-{sample_path.stem}.docx"
+        save_deterministic(doc, OUT_DIR / out_name)
+        generated.append(out_name)
 
-    print("Generated idea-v12-blank.docx and idea-v12-sample.docx")
+    print(f"Generated {', '.join(generated)}")
 
 
 if __name__ == "__main__":

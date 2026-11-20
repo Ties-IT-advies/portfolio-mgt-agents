@@ -110,7 +110,7 @@ Full role descriptions (who they are, when they interact, what they need from th
 - Steering Group structure follows ScripeConnect12's standard PRINCE2-style model: Opdrachtgever, Senior User, Senior Supplier
 - The three governance tiers (Portfolio Board → Steering Group → Execution) preserve clear accountability and decision authority at each level
 - Role descriptions define functional needs, not job titles — organizations of any size can combine or split roles as needed
-- Client-specific examples (e.g. Feyenoord) from ScripeConnect12's source material were generalized/removed from our documentation
+- Client-specific examples from ScripeConnect12's source material were generalized/removed from our documentation
 
 **Status:** Role structure is defined; open questions on advisor-vs-user role separation, access/permission model, and role-specific dashboards remain tracked in `roles-and-personas.md` under "Questions for Refinement."
 
@@ -138,9 +138,9 @@ Align all execution templates with the structure and content of the templates Sc
 **Rationale:**
 ScripeConnect12's templates reflect real, field-tested governance documents already in use. Aligning our system's templates to that structure means the tool produces artifacts that plug directly into an organization's existing governance process rather than introducing a parallel, incompatible format. Markdown was retained (over replicating Word/PowerPoint) because it is the native format for agent-generated output and version control.
 
-**Result:** `templates/execution-templates.md` contains 9 primary templates + 2 supporting templates, each mapped to a lifecycle phase and to the primary role(s) who use it. New templates created to cover gaps versus ScripeConnect12's set: Project Brief, Project Initiation Document (PID), Project Start Architecture, Go/No-Go Decision, Change Request.
+**Result:** `templates/` now contains `execution-templates.md` (index) plus 11 standalone template files. Content was moved verbatim; only the per-template heading level/numbering (`## N. Name` → `# Name`) and the file's own dangling trailing separators were normalized, since those were artifacts of the bundled file, not template content.
 
-**Note:** All references to the Feyenoord client example present in ScripeConnect12's source material were removed from our derived documentation, per explicit instruction.
+**Note:** All client-specific references present in ScripeConnect12's source material were removed from our derived documentation, per explicit instruction.
 
 ---
 

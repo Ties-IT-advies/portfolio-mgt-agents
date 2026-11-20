@@ -141,6 +141,13 @@ def test_rule4_nonempty_answer_null_quote():
     assert any("rule 4" in v and "background" in v for v in violations)
 
 
+def test_rule4_whitespace_only_quote():
+    a = _assessment()
+    a["fields"][0]["quote"] = "   "
+    violations = validate(a, _answers())
+    assert any("rule 4" in v and "background" in v for v in violations)
+
+
 def test_rule5_empty_reason():
     a = _assessment()
     a["fields"][0]["reason"] = ""

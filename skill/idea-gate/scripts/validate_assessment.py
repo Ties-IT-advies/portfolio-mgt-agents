@@ -90,7 +90,7 @@ def _check_field_entry(fid: str, entry: dict, answer: str) -> list[str]:
                 f"rule 4: field {fid!r} has empty answer; quote must be null"
             )
     else:
-        if not isinstance(quote, str) or not quote:
+        if not isinstance(quote, str) or not quote.strip():
             violations.append(
                 f"rule 4: field {fid!r} has non-empty answer; "
                 f"quote must be a non-empty string"

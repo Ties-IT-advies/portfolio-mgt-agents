@@ -6,9 +6,21 @@ template guidance text, which contain both languages and would skew detection.
 
 from __future__ import annotations
 
+import importlib.util
 import re
+from pathlib import Path
 
-_SUPPORTED = frozenset({"nl", "en"})
+
+def _load_i18n():
+    spec = importlib.util.spec_from_file_location(
+        "i18n", Path(__file__).parent / "i18n.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_SUPPORTED = frozenset(_load_i18n().SUPPORTED_LANGS)
 
 _NL_STOP_WORDS = frozenset({
     "de", "het", "een", "van", "zijn", "die", "ook", "maar",
@@ -38,7 +50,7 @@ DOMINANCE_RATIO = 2.0
 
 
 def _tokenize(text: str) -> list[str]:
-    return re.findall(r"[a-z]+", text.lower())
+    return re.findall(r"[^\W\d_]+", text.lower())
 
 
 def detect_language(text: str) -> str:

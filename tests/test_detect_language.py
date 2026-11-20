@@ -58,6 +58,14 @@ def test_detect_empty_returns_unknown():
     assert mod.detect_language("") == "unknown"
 
 
+def test_diacritic_word_not_split_into_stop_word():
+    # With [a-z]+ tokenizer "Creëer" splits into ["cre", "er"]; "er" is a
+    # Dutch stop-word, producing a false Dutch detection. With [^\W\d_]+
+    # the whole word is kept as one token and no stop-word is hit.
+    text = " ".join(["Creëer"] * 15)
+    assert mod.detect_language(text) == "unknown"
+
+
 def test_resolve_override_wins_over_dutch_detection():
     assert mod.resolve_language(DUTCH_TEXT, override="en") == "en"
 

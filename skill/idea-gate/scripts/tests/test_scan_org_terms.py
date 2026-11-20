@@ -9,7 +9,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from org_terms_io import load_denylist_env  # noqa: E402
-from scan_org_terms import build_pattern, main, scan_docx_blob, scan_text_file  # noqa: E402
+from scan_org_terms import build_pattern, main, scan_all, scan_docx_blob, scan_push, scan_text_file  # noqa: E402
 
 TERM = "acme"
 PATTERN = build_pattern([TERM])
@@ -97,3 +97,39 @@ def test_unset_denylist_env_warns(monkeypatch, capsys):
 def test_empty_denylist_env_exits_zero(monkeypatch):
     monkeypatch.setenv("EMPTY_VAR", "")
     assert main(["--all", "--denylist-env", "EMPTY_VAR"]) == 0
+
+
+# --- path containing the term ---
+
+def test_scan_all_path_match_locations_only_no_term(tmp_path, monkeypatch):
+    p = tmp_path / f"{TERM}_doc.txt"
+    p.write_text("clean content\n")
+    monkeypatch.setattr("scan_org_terms.get_tracked_files", lambda: [p])
+    hits = scan_all(PATTERN, locations_only=True)
+    assert len(hits) == 1
+    assert TERM.lower() not in hits[0].lower()
+
+
+def test_scan_all_path_match_reported(tmp_path, monkeypatch):
+    p = tmp_path / f"{TERM}_doc.txt"
+    p.write_text("clean content\n")
+    monkeypatch.setattr("scan_org_terms.get_tracked_files", lambda: [p])
+    hits = scan_all(PATTERN, locations_only=False)
+    assert len(hits) == 1
+    assert "[filename]:" in hits[0]
+
+
+def test_scan_push_filename_match_locations_only_no_term(monkeypatch):
+    monkeypatch.setattr("scan_org_terms.parse_added_lines", lambda _: [])
+    monkeypatch.setattr("scan_org_terms.get_changed_filenames", lambda _: [f"docs/{TERM}_report.txt"])
+    hits = scan_push("abc..def", PATTERN, locations_only=True)
+    assert len(hits) == 1
+    assert TERM.lower() not in hits[0].lower()
+
+
+def test_scan_push_filename_match_reported(monkeypatch):
+    monkeypatch.setattr("scan_org_terms.parse_added_lines", lambda _: [])
+    monkeypatch.setattr("scan_org_terms.get_changed_filenames", lambda _: [f"docs/{TERM}_report.txt"])
+    hits = scan_push("abc..def", PATTERN, locations_only=False)
+    assert len(hits) == 1
+    assert "[filename]:" in hits[0]

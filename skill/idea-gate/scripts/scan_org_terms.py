@@ -58,7 +58,7 @@ def get_changed_filenames(git_range: str) -> list[str]:
     return [f for f in _git(["diff", "--name-only", git_range]).splitlines() if f]
 
 
-def _scan_docx_content(doc, label: str, pattern: re.Pattern, locations_only: bool) -> list[str]:
+def _scan_docx_content(doc, label: str, pattern: re.Pattern, locations_only: bool = False) -> list[str]:
     hits = []
     for i, para in enumerate(doc.paragraphs, 1):
         if para.text and pattern.search(para.text):
@@ -72,16 +72,16 @@ def _scan_docx_content(doc, label: str, pattern: re.Pattern, locations_only: boo
     return hits
 
 
-def scan_docx_file(path: Path, pattern: re.Pattern, locations_only: bool) -> list[str]:
+def scan_docx_file(path: Path, pattern: re.Pattern, locations_only: bool = False, label: str | None = None) -> list[str]:
     from docx import Document
     try:
         doc = Document(str(path))
     except Exception:
         return []
-    return _scan_docx_content(doc, str(path), pattern, locations_only)
+    return _scan_docx_content(doc, label or str(path), pattern, locations_only)
 
 
-def scan_docx_blob(blob: bytes, label: str, pattern: re.Pattern, locations_only: bool) -> list[str]:
+def scan_docx_blob(blob: bytes, label: str, pattern: re.Pattern, locations_only: bool = False) -> list[str]:
     from docx import Document
     try:
         doc = Document(io.BytesIO(blob))
@@ -90,7 +90,7 @@ def scan_docx_blob(blob: bytes, label: str, pattern: re.Pattern, locations_only:
     return _scan_docx_content(doc, label, pattern, locations_only)
 
 
-def scan_text_file(path: Path, pattern: re.Pattern, locations_only: bool) -> list[str]:
+def scan_text_file(path: Path, pattern: re.Pattern, locations_only: bool = False, label: str | None = None) -> list[str]:
     try:
         lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
     except OSError:
@@ -98,43 +98,51 @@ def scan_text_file(path: Path, pattern: re.Pattern, locations_only: bool) -> lis
     hits = []
     for i, line in enumerate(lines, 1):
         if pattern.search(line):
-            hits.append(text_hit(str(path), i, line, locations_only))
+            hits.append(text_hit(label or str(path), i, line, locations_only))
     return hits
 
 
-def scan_file(path: Path, pattern: re.Pattern, locations_only: bool) -> list[str]:
+def scan_file(path: Path, pattern: re.Pattern, locations_only: bool = False, label: str | None = None) -> list[str]:
     if path.suffix.lower() == ".docx":
-        return scan_docx_file(path, pattern, locations_only)
-    return scan_text_file(path, pattern, locations_only)
+        return scan_docx_file(path, pattern, locations_only, label)
+    return scan_text_file(path, pattern, locations_only, label)
 
 
 def get_tracked_files() -> list[Path]:
     return [Path(p) for p in _git(["ls-files"]).splitlines() if p]
 
 
-def scan_all(pattern: re.Pattern, locations_only: bool) -> list[str]:
+def scan_all(pattern: re.Pattern, locations_only: bool = False) -> list[str]:
     hits = []
-    for path in get_tracked_files():
-        if path.exists():
-            hits.extend(scan_file(path, pattern, locations_only))
+    for idx, path in enumerate(get_tracked_files(), 1):
+        if not path.exists():
+            continue
+        path_str = str(path)
+        path_hits = bool(pattern.search(path_str))
+        label = f"[redacted path: tracked file #{idx}]" if (locations_only and path_hits) else path_str
+        if path_hits:
+            hits.append(label if locations_only else f"[filename]: {path_str}")
+        hits.extend(scan_file(path, pattern, locations_only, label=label))
     return hits
 
 
-def scan_push(git_range: str, pattern: re.Pattern, locations_only: bool) -> list[str]:
+def scan_push(git_range: str, pattern: re.Pattern, locations_only: bool = False) -> list[str]:
     hits = []
     for fname, lineno, content in parse_added_lines(git_range):
         if pattern.search(content):
             hits.append(text_hit(fname, lineno, content, locations_only))
     head_sha = git_range.split("..")[-1]
-    for name in get_changed_filenames(git_range):
-        if pattern.search(name):
-            hits.append(f"[filename]: {name}")
+    for idx, name in enumerate(get_changed_filenames(git_range), 1):
+        name_hits = bool(pattern.search(name))
+        label = f"[redacted path: changed file #{idx}]" if (locations_only and name_hits) else name
+        if name_hits:
+            hits.append(label if locations_only else f"[filename]: {name}")
         if name.lower().endswith(".docx"):
             try:
                 blob = _git_bytes(["show", f"{head_sha}:{name}"])
             except subprocess.CalledProcessError:
                 continue
-            hits.extend(scan_docx_blob(blob, name, pattern, locations_only))
+            hits.extend(scan_docx_blob(blob, label, pattern, locations_only))
     return hits
 
 

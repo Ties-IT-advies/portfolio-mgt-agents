@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -89,3 +91,29 @@ def test_resolve_invalid_override_raises():
 
 def test_resolve_unknown_passthrough():
     assert mod.resolve_language("Dit is een kort stukje.") == "unknown"
+
+
+def test_cli_detects_dutch(tmp_path):
+    answers = {"fields": {"field1": DUTCH_TEXT}}
+    p = tmp_path / "test.answers.json"
+    p.write_text(json.dumps(answers), encoding="utf-8")
+    result = subprocess.run(
+        ["python", str(_SCRIPTS / "detect_language.py"), str(p)],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "nl"
+
+
+def test_cli_override_en(tmp_path):
+    answers = {"fields": {"field1": DUTCH_TEXT}}
+    p = tmp_path / "test.answers.json"
+    p.write_text(json.dumps(answers), encoding="utf-8")
+    result = subprocess.run(
+        ["python", str(_SCRIPTS / "detect_language.py"), str(p), "--override", "en"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "en"

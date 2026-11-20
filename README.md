@@ -48,6 +48,25 @@ portfolio-management-agents/
     └── Portfolio Health Dashboard Template.md
 ```
 
+## Available Skills
+
+Skills are stored under `skill/`. Each skill has a stub at
+`.claude/skills/<name>/SKILL.md` that tells Claude Code where to find the actual
+skill, so Claude Code discovers them automatically when the repo is opened.
+
+| Skill | Trigger | Location |
+|-------|---------|----------|
+| `idea-gate` | Assess a Project Idea `.docx` | `skill/idea-gate/` |
+
+**Discovery:** `.claude/skills/idea-gate/SKILL.md` is a stub that tells Claude
+Code to load `skill/idea-gate/SKILL.md`. No special setup required on any
+platform.
+
+To assess an idea document:
+1. Open this repo in Claude Code.
+2. Ask: *"Assess `<path/to/idea.docx>`"* — Claude Code will load the
+   `idea-gate` skill and walk through the procedure automatically.
+
 ## Validating Changes
 
 Run `./check` before committing — it's the single entry point for

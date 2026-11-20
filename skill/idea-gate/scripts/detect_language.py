@@ -95,3 +95,26 @@ def resolve_language(text: str, override: str | None = None) -> str:
             )
         return override
     return detect_language(text)
+
+
+if __name__ == "__main__":
+    import argparse
+    import json
+    import sys
+
+    parser = argparse.ArgumentParser(
+        description="Detect the language of a project idea answers JSON file."
+    )
+    parser.add_argument("answers_json", help="Path to <name>.answers.json")
+    parser.add_argument(
+        "--override",
+        choices=["en", "nl"],
+        help="Override the detected language",
+    )
+    _args = parser.parse_args()
+
+    with open(_args.answers_json, encoding="utf-8") as _fh:
+        _answers = json.load(_fh)
+
+    _combined = " ".join(v for v in _answers["fields"].values() if v.strip())
+    print(resolve_language(_combined, override=_args.override))

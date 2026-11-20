@@ -41,3 +41,13 @@ def text(key: str, lang: str) -> str:
             f"Key {key!r} in locale {lang!r} resolves to a non-string value"
         )
     return node
+
+
+if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) != 3:
+        print("Usage: python i18n.py <key> <lang>", file=sys.stderr)
+        sys.exit(1)
+    _key, _lang = sys.argv[1], sys.argv[2]
+    print(text(_key, _lang))

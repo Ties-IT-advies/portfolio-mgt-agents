@@ -7,24 +7,24 @@ import pytest
 _SCRIPTS = Path(__file__).parent.parent / "skill" / "idea-gate" / "scripts"
 
 
-def _load_locale():
+def _load_i18n():
     spec = importlib.util.spec_from_file_location(
-        "idea_gate_locale", _SCRIPTS / "locale.py"
+        "idea_gate_i18n", _SCRIPTS / "i18n.py"
     )
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
 
 
-locale_mod = _load_locale()
+i18n_mod = _load_i18n()
 
 
 def test_ratings_point_of_attention_nl():
-    assert locale_mod.text("ratings.point_of_attention", "nl") == "Aandachtspunt"
+    assert i18n_mod.text("ratings.point_of_attention", "nl") == "Aandachtspunt"
 
 
 def test_ratings_sufficient_en():
-    assert locale_mod.text("ratings.sufficient", "en") == "Sufficient"
+    assert i18n_mod.text("ratings.sufficient", "en") == "Sufficient"
 
 
 def test_all_core_vocab_en():
@@ -38,7 +38,7 @@ def test_all_core_vocab_en():
         "board_advice.title": "Advice to the Portfolio Board",
     }
     for key, val in expected.items():
-        assert locale_mod.text(key, "en") == val
+        assert i18n_mod.text(key, "en") == val
 
 
 def test_all_core_vocab_nl():
@@ -52,27 +52,27 @@ def test_all_core_vocab_nl():
         "board_advice.title": "Advies aan de Portfolio Board",
     }
     for key, val in expected.items():
-        assert locale_mod.text(key, "nl") == val
+        assert i18n_mod.text(key, "nl") == val
 
 
 def test_field_label_en():
-    assert locale_mod.text("fields.date.label", "en") == "Date"
+    assert i18n_mod.text("fields.date.label", "en") == "Date"
 
 
 def test_field_label_nl():
-    assert locale_mod.text("fields.date.label", "nl") == "Datum"
+    assert i18n_mod.text("fields.date.label", "nl") == "Datum"
 
 
 def test_unknown_key_raises():
     with pytest.raises(KeyError, match="not found"):
-        locale_mod.text("ratings.nonexistent", "en")
+        i18n_mod.text("ratings.nonexistent", "en")
 
 
 def test_unsupported_language_raises():
     with pytest.raises(ValueError, match="Unsupported language"):
-        locale_mod.text("ratings.sufficient", "fr")
+        i18n_mod.text("ratings.sufficient", "fr")
 
 
 def test_non_string_key_raises():
     with pytest.raises(KeyError, match="non-string"):
-        locale_mod.text("fields.strategic_contribution.objectives", "en")
+        i18n_mod.text("fields.strategic_contribution.objectives", "en")

@@ -77,6 +77,35 @@ command on every PR and on pushes to `main`, plus the two network-dependent
 traceability links (`check-pr-issue-link.sh`, `check-main-via-pr.sh`) —
 nothing separate is invented for CI.
 
+## Running the Evaluation
+
+`./eval` runs the idea-gate skill headless on every `.docx` fixture,
+validates each result, and reports a V1 pass rate. This is the automated
+proof for KR 1.2. It is not called by CI.
+
+```bash
+# Run against all fixtures (default):
+./eval
+
+# Run a subset:
+./eval --fixture "tests/fixtures/idea-v12-sample.docx"
+
+# Repeat each fixture N times (stores every run, for V4 / KR 1.3):
+./eval --runs 3
+```
+
+Results are written to `.eval-out/<timestamp>/` (git-ignored). Exit code is
+0 only when every fixture validates without violations. Each fixture run
+times out after 600 seconds.
+
+`./eval` invokes `claude` with
+`--allowedTools Read,Write,Bash(python skill/idea-gate/scripts/*)` —
+only the tools the skill actually needs. No additional permissions are required.
+
+**Note:** `./eval` requires the invoker's own Claude Code login — no API key
+is stored in the repo. Run `chmod +x eval` after cloning if the execute bit
+is not set.
+
 ## Organization data
 
 Real organization data — your investment threshold, internal project names, calibration benchmarks, and sensitive terms — must never be committed to this repository. It lives in a local folder outside the repo.

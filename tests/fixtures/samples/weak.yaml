@@ -1,0 +1,27 @@
+# Sample: weak — onvolledig idee dat kwaliteitsproblemen uitoefent: lege velden, TBD-antwoorden,
+# doel zonder maatstaf, teamnaam als sponsor, minder dan drie risico's zonder mitigatie,
+# en strategische doelstellingen aangevinkt zonder toelichting.
+project_name: "Interne Rapportage Tool"
+header:
+  prepared_by: "TBD"        # quality: weak — geen naam of functie opgegeven
+  date: "2024-03-01"        # quality: strong
+  status: "Concept"         # quality: strong
+body:
+  background: "We hebben betere rapportages nodig."  # quality: weak — symptoom zonder zakelijke context of kwantificering
+  objective: "Het doel is een rapportagetool te implementeren."  # quality: weak — geen meetbare succesmaatstaf
+  sponsor: "IT-afdeling"  # quality: weak — teamnaam in plaats van een individu
+  people_involved: "Nog te bepalen."  # quality: weak — volledig TBD
+  costs: "nog te bepalen"  # quality: weak — kaal TBD
+  budget: "Er is budget beschikbaar."  # quality: weak — geen bedrag of bron
+  benefits: "Tijdsbesparing voor medewerkers."  # quality: weak — geen maatstaf, geen nadelen overwogen
+  timelines: "Start zo snel mogelijk."  # quality: weak — geen datum of mijlpalen
+  risks: "1. Vertraging. 2. Budgetoverschrijding."  # quality: weak — minder dan drie risico's, geen mitigatie, geen eigenaren
+  departments_involved: "IT"  # quality: weak — één afdeling, geen cross-functionele classificatie overwogen
+  complexity: "Laag."  # quality: weak — bewering zonder onderbouwing
+strategic_picks:
+  - objective: operational_excellence
+    index: 1
+    explanation: ""  # quality: weak — strategische doelstelling aangevinkt zonder toelichting
+  - objective: strategic_performance
+    index: 2
+    explanation: ""  # quality: weak — strategische doelstelling aangevinkt zonder toelichting

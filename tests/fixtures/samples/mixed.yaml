@@ -1,0 +1,23 @@
+# Sample: mixed — ruwweg een derde sterk, een derde verklaarde onzekerheid, een derde zwak.
+# Bedoeld om te testen of de beoordelaar partiële kwaliteit correct herkent.
+project_name: "Automatische Factuurverwerking"
+header:
+  prepared_by: "K. van den Berg, Financieel Manager"  # quality: strong
+  date: "2024-04-10"                                  # quality: strong
+  status: "Concept"                                   # quality: strong
+body:
+  background: "Verbogen BV verwerkt maandelijks ~600 inkomende facturen handmatig. Dit kost het Finance-team gemiddeld 3,5 FTE per maand en leidt tot betalingsfouten in ca. 8% van de gevallen. Automatisering reduceert de foutmarge en maakt capaciteit vrij voor analyse."  # quality: strong
+  objective: "Het doel is het factuurverwerkingsproces te automatiseren."  # quality: weak — geen meetbare succesmaatstaf
+  sponsor: "P. Lagerweij, CFO"  # quality: strong
+  people_involved: "Project Manager: K. van den Berg (Finance). IT-contact: nog aan te wijzen — selectie loopt parallel aan leverancierstraject. Leverancier: in selectie."  # quality: explained uncertainty — PM bekend, rest TBD met reden
+  costs: "Interne capaciteit: 120–180 uur (bandbreedte afhankelijk van leveranciersselectie). Licentiekosten: €15.000–€22.000/jaar; aanname: SaaS-model met volumekorting boven 500 facturen/maand."  # quality: explained uncertainty — bandbreedte met genoemde aanname
+  budget: "€80.000 gereserveerd in begroting 2024; formele goedkeuring volgt na leveranciersselectie in april."  # quality: explained uncertainty — bedrag bekend, formele goedkeuring uitstaande met reden
+  benefits: "Tijdsbesparing Finance-team."  # quality: weak — geen maatstaf, geen nadelen
+  timelines: "Beoogde start: mei 2024. Go-live: Q4 2024. Vertrouwensniveau: laag — afhankelijk van leverancierskeuze die nog niet is afgerond. Mijlpalen worden vastgesteld na contractering."  # quality: explained uncertainty — onzekerheid benoemd met reden
+  risks: "1. Leverancier haalt deadline niet — eigenaar: K. van den Berg."  # quality: weak — minder dan drie risico's, geen mitigatie
+  departments_involved: "Finance, IT. Twee afdelingen betrokken — projectclassificatie: cross-functioneel."  # quality: strong
+  complexity: "Inschatting: Gemiddeld. Technisch: standaard OCR-koppeling, beperkte ERP-integratie. Organisatorisch: change management Finance vereist. Openstaande afhankelijkheid: leveranciersselectie loopt nog."  # quality: explained uncertainty — beoordeling gegeven met genoemde drijfveren en open afhankelijkheid
+strategic_picks:
+  - objective: operational_excellence
+    index: 2
+    explanation: ""  # quality: weak — strategische doelstelling aangevinkt zonder toelichting

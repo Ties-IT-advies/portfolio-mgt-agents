@@ -37,6 +37,10 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements-dev.txt
       - run: ./check
+      - name: Org-term CI gate
+        env:
+          ORG_DENYLIST: ${{ secrets.ORG_DENYLIST }}
+        run: python skill/idea-gate/scripts/scan_org_terms.py --all --locations-only --denylist-env ORG_DENYLIST
       - name: PR references issue (link 3)
         if: github.event_name == 'pull_request'
         env:

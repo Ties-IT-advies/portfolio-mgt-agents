@@ -5,11 +5,14 @@ import importlib.util
 import io
 import subprocess
 import sys
+from io import BytesIO
 from pathlib import Path
 
 import pytest
 
 _SCRIPTS = Path(__file__).parent.parent / "skill" / "idea-gate" / "scripts"
+
+TERM = "acme"
 
 
 def _load_scan():
@@ -22,6 +25,17 @@ def _load_scan():
 
 
 scan = _load_scan()
+PATTERN = scan.build_pattern([TERM])
+
+
+def _docx_with_table_cell(text: str) -> bytes:
+    from docx import Document
+    doc = Document()
+    table = doc.add_table(rows=1, cols=1)
+    table.cell(0, 0).text = text
+    buf = BytesIO()
+    doc.save(buf)
+    return buf.getvalue()
 
 
 def _make_denylist(directory: Path, terms: list) -> Path:
@@ -195,3 +209,113 @@ def test_push_invalid_range_exits_2(git_repo, monkeypatch, capsys):
     assert exit_code == 2
     captured = capsys.readouterr()
     assert "Error" in captured.err
+
+
+# --- --locations-only: text file ---
+
+def test_locations_only_text_has_location(tmp_path):
+    f = tmp_path / "file.txt"
+    f.write_text(f"line with {TERM} in it\n")
+    hits = scan.scan_text_file(f, PATTERN, locations_only=True)
+    assert len(hits) == 1
+    assert ":1" in hits[0]
+
+
+def test_locations_only_text_no_term(tmp_path):
+    f = tmp_path / "file.txt"
+    f.write_text(f"line with {TERM} in it\n")
+    hits = scan.scan_text_file(f, PATTERN, locations_only=True)
+    assert TERM.lower() not in hits[0].lower()
+
+
+def test_locations_off_text_includes_term(tmp_path):
+    f = tmp_path / "file.txt"
+    f.write_text(f"line with {TERM} in it\n")
+    hits = scan.scan_text_file(f, PATTERN, locations_only=False)
+    assert TERM.lower() in hits[0].lower()
+
+
+# --- --locations-only: .docx table cell ---
+
+def test_locations_only_docx_table_has_location():
+    blob = _docx_with_table_cell(f"cell containing {TERM}")
+    hits = scan.scan_docx_blob(blob, "report.docx", PATTERN, locations_only=True)
+    assert len(hits) == 1
+    assert "table" in hits[0]
+    assert "row" in hits[0]
+
+
+def test_locations_only_docx_table_no_term():
+    blob = _docx_with_table_cell(f"cell containing {TERM}")
+    hits = scan.scan_docx_blob(blob, "report.docx", PATTERN, locations_only=True)
+    assert TERM.lower() not in hits[0].lower()
+
+
+# --- --denylist-env reads from env var ---
+
+def test_denylist_env_reads_terms(monkeypatch):
+    monkeypatch.setenv("TEST_DENYLIST", f"{TERM}\n# comment\nsecondterm\n")
+    result = scan.load_denylist_env("TEST_DENYLIST")
+    assert result == [TERM, "secondterm"]
+
+
+def test_denylist_env_ignores_comments_and_blanks(monkeypatch):
+    monkeypatch.setenv("MY_VAR", "  \n# skip\n  term1  \n\n")
+    result = scan.load_denylist_env("MY_VAR")
+    assert result == ["term1"]
+
+
+# --- unset variable warns and exits 0 ---
+
+def test_unset_denylist_env_exits_zero(monkeypatch):
+    monkeypatch.delenv("MISSING_VAR", raising=False)
+    assert scan.main(["--all", "--denylist-env", "MISSING_VAR"]) == 0
+
+
+def test_unset_denylist_env_warns(monkeypatch, capsys):
+    monkeypatch.delenv("MISSING_VAR", raising=False)
+    scan.main(["--all", "--denylist-env", "MISSING_VAR"])
+    err = capsys.readouterr().err
+    assert "MISSING_VAR" in err
+    assert "unset or empty" in err
+
+
+def test_empty_denylist_env_exits_zero(monkeypatch):
+    monkeypatch.setenv("EMPTY_VAR", "")
+    assert scan.main(["--all", "--denylist-env", "EMPTY_VAR"]) == 0
+
+
+# --- path containing the term ---
+
+def test_scan_all_path_match_locations_only_no_term(tmp_path, monkeypatch):
+    p = tmp_path / f"{TERM}-doc.txt"
+    p.write_text("clean content\n")
+    monkeypatch.setattr(scan, "get_tracked_files", lambda: [p])
+    hits = scan.scan_all(PATTERN, locations_only=True)
+    assert len(hits) == 1
+    assert TERM.lower() not in hits[0].lower()
+
+
+def test_scan_all_path_match_reported(tmp_path, monkeypatch):
+    p = tmp_path / f"{TERM}-doc.txt"
+    p.write_text("clean content\n")
+    monkeypatch.setattr(scan, "get_tracked_files", lambda: [p])
+    hits = scan.scan_all(PATTERN, locations_only=False)
+    assert len(hits) == 1
+    assert "[filename]:" in hits[0]
+
+
+def test_scan_push_filename_match_locations_only_no_term(monkeypatch):
+    monkeypatch.setattr(scan, "parse_added_lines", lambda _: [])
+    monkeypatch.setattr(scan, "get_changed_filenames", lambda _: [f"docs/{TERM}-report.txt"])
+    hits = scan.scan_push("abc..def", PATTERN, locations_only=True)
+    assert len(hits) == 1
+    assert TERM.lower() not in hits[0].lower()
+
+
+def test_scan_push_filename_match_reported(monkeypatch):
+    monkeypatch.setattr(scan, "parse_added_lines", lambda _: [])
+    monkeypatch.setattr(scan, "get_changed_filenames", lambda _: [f"docs/{TERM}-report.txt"])
+    hits = scan.scan_push("abc..def", PATTERN, locations_only=False)
+    assert len(hits) == 1
+    assert "[filename]:" in hits[0]

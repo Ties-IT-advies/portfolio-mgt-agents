@@ -17,7 +17,7 @@ body:
   risks: |-  # quality: strong
     1. Vendor delay — mitigation: contractual deadline, alternative vendor identified; owner: S. Jansen.
     2. Low customer adoption — mitigation: communication campaign + onboarding tour; owner: L. Smits.
-    3. Data corruption during customer data migration — mitigation: test migration round + rollback procedure; owner: R. Hoekstra.
+    3. Data disruption during customer data migration — mitigation: test migration round + rollback procedure; owner: R. Hoekstra.
   departments_involved: "IT, Customer Service, Marketing. Multiple departments involved — project classification: cross-functional."  # quality: strong
   complexity: "Estimate: Medium. Technical: standard SaaS integration, limited customisation. Organisational: three departments, change management required. Dependencies: vendor selection not yet finalised."  # quality: strong
 strategic_picks:

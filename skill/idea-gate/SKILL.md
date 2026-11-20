@@ -10,21 +10,21 @@ Assess a submitted Project Idea document. Never edit the input `.docx`.
 All scripts live in `skill/idea-gate/scripts/`. Install dependencies if needed:
 `python -m pip install -r requirements-dev.txt`.
 
+Run each command exactly as written; the eval harness only permits these command shapes.
+
 ---
 
 ## Step 1 — Extract answers
 
-Run `extract_idea.py` on the given `.docx`:
+Derive `<name>` as the input file's stem (no extension, no directory). Then run:
 
 ```bash
-python skill/idea-gate/scripts/extract_idea.py <path/to/file.docx>
+python skill/idea-gate/scripts/extract_idea.py <path/to/file.docx> --out <name>.answers.json
 ```
 
-This returns a JSON object with keys `project_name`, `fields` (id → answer text),
-`unmatched_labels`, and `missing_fields`.
-
-Derive `<name>` as the input file's stem (no extension, no directory).
-Write the JSON to `<name>.answers.json` next to the input file.
+This writes a JSON object — `project_name`, `fields` (id → answer text),
+`unmatched_labels`, and `missing_fields` — to `<name>.answers.json` next to
+the input file.
 
 ---
 
@@ -119,9 +119,7 @@ for the detected version).
 ## Step 6 — Validate and self-correct
 
 ```bash
-python skill/idea-gate/scripts/validate_assessment.py \
-  <name>.assessment.json \
-  <name>.answers.json
+python skill/idea-gate/scripts/validate_assessment.py <name>.assessment.json <name>.answers.json
 ```
 
 If validation reports violations, fix the assessment JSON and re-run. Attempt

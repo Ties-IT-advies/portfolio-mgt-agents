@@ -51,4 +51,6 @@ def check() -> bool:
 
 
 if __name__ == "__main__":
+    from cli_utils import configure_utf8_streams
+    configure_utf8_streams()
     sys.exit(0 if check() else 1)

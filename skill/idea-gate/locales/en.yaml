@@ -77,3 +77,16 @@ fields:
   complexity:
     label: "Complexity"
     guidance: "How complex is this project and why? Consider technical complexity, organisational complexity, and dependencies."
+
+ratings:
+  sufficient: "Sufficient"
+  point_of_attention: "Point of Attention"
+  insufficient: "Insufficient"
+
+classification:
+  not_a_project: "Not a project"
+  normal_project: "Normal project"
+  portfolio_project: "Portfolio project"
+
+board_advice:
+  title: "Advice to the Portfolio Board"

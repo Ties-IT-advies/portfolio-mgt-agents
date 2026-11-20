@@ -79,3 +79,16 @@ fields:
   complexity:
     label: "Complexiteit"
     guidance: "Hoe complex is dit project en waarom? Denk hierbij aan technische complexiteit, organisatorische complexiteit en afhankelijkheden."
+
+ratings:
+  sufficient: "Voldoende"
+  point_of_attention: "Aandachtspunt"
+  insufficient: "Onvoldoende"
+
+classification:
+  not_a_project: "Geen project"
+  normal_project: "Normaal project"
+  portfolio_project: "Portfolioproject"
+
+board_advice:
+  title: "Advies aan de Portfolio Board"

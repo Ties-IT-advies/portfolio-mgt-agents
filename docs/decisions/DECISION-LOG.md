@@ -191,6 +191,27 @@ Promote the Project Idea Submission Template to v12 by adding three fields (`str
 
 ---
 
+## Entry 7
+
+**Decision ID:** DEC-007
+**Topic:** Separation of `./check` (offline) and `./eval` (model-driven)
+**Status:** Approved
+
+**Decision Made:**
+`./check` is the CI gate: offline, deterministic, runs on every PR. It covers scripts, validators, and committed fixtures, but never calls the model. `./eval` is the separate evaluation harness: invokes Claude Code headless on every `.docx` fixture, validates each result against the schema validator, and reports a V1 pass rate. `./eval` is run by the Portfolio Manager; it is never invoked by CI.
+
+**Rationale:**
+- **No API key in CI.** Calling the model from CI would require a stable API key in the repo or secrets, introduce non-determinism, and add latency/cost to every PR check.
+- **Separation of concerns.** `./check` answers "is the code correct?"; `./eval` answers "does the skill produce valid output on real fixtures?". These are different questions on different cadences.
+- **Verification path for V1 and V4.** V1 (KR 1.2 — every field rated with quoted evidence) and V4 (KR 1.3 — repeat runs for stability) are both verified by running `./eval`, not by CI. The Portfolio Manager runs `./eval` after meaningful skill changes.
+
+**Implications:**
+- `./check` and `.github/workflows/ci.yml` must not call `./eval`.
+- `./eval --runs N` stores N result sets per fixture in `.eval-out/<timestamp>/`; comparison logic is out of scope for V1 (deferred to KR 1.3).
+- KR 1.2 is verified via `./eval`, not via a CI status check.
+
+---
+
 ## Open Items Carried Forward
 
 These are not yet decided and should be resolved before or during early development:

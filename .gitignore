@@ -9,3 +9,4 @@ denylist.txt
 .portfolio-mgt-agents/
 *.answers.json
 *.assessment.json
+.eval-out/

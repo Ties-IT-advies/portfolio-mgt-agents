@@ -137,6 +137,9 @@ def validate(assessment: dict, answers: dict) -> list[str]:
 
 
 def main() -> int:
+    from cli_utils import configure_utf8_streams
+    configure_utf8_streams()
+
     if len(sys.argv) != 3:
         print(
             f"Usage: {sys.argv[0]} <assessment.json> <answers.json>",

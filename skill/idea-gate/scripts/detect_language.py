@@ -101,6 +101,8 @@ if __name__ == "__main__":
     import argparse
     import json
     import sys
+    from cli_utils import configure_utf8_streams
+    configure_utf8_streams()
 
     parser = argparse.ArgumentParser(
         description="Detect the language of a project idea answers JSON file."

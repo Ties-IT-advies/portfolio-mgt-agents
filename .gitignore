@@ -10,3 +10,4 @@ denylist.txt
 *.answers.json
 *.assessment.json
 .eval-out/
+__pycache__/

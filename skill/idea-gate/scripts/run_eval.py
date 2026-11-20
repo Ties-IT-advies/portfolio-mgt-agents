@@ -57,6 +57,7 @@ def default_runner(fixture_path: Path) -> tuple[dict, dict]:
             ],
             capture_output=True,
             text=True,
+            stdin=subprocess.DEVNULL,
             cwd=_REPO_ROOT,
             timeout=_RUN_TIMEOUT_S,
         )
@@ -141,6 +142,9 @@ def _report(results: list[dict]) -> int:
 
 
 def main() -> int:
+    from cli_utils import configure_utf8_streams
+    configure_utf8_streams()
+
     parser = argparse.ArgumentParser(
         description="Run idea-gate skill on fixtures and validate results."
     )

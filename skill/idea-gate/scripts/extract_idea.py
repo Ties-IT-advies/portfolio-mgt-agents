@@ -1,7 +1,7 @@
 """Extract field answers from a Project Idea .docx into answers per field id."""
+import argparse
 import json
 import re
-import sys
 from pathlib import Path
 
 import yaml
@@ -127,11 +127,27 @@ def extract(path) -> dict:
 
 
 def main() -> None:
-    if len(sys.argv) != 2:
-        print("Usage: extract_idea.py <file.docx>", file=sys.stderr)
-        sys.exit(1)
-    result = extract(Path(sys.argv[1]))
-    print(json.dumps(result, ensure_ascii=False, indent=2))
+    from cli_utils import configure_utf8_streams
+    configure_utf8_streams()
+
+    parser = argparse.ArgumentParser(
+        description="Extract answers from a Project Idea .docx."
+    )
+    parser.add_argument("docx", help="Path to the .docx file")
+    parser.add_argument(
+        "--out",
+        metavar="PATH",
+        help="Write JSON to PATH as UTF-8; nothing is printed to stdout",
+    )
+    args = parser.parse_args()
+
+    result = extract(Path(args.docx))
+    json_str = json.dumps(result, ensure_ascii=False, indent=2)
+
+    if args.out:
+        Path(args.out).write_text(json_str, encoding="utf-8")
+    else:
+        print(json_str)
 
 
 if __name__ == "__main__":

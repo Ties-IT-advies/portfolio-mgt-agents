@@ -2,15 +2,15 @@
 import yaml
 from pathlib import Path
 
-_SUPPORTED_LANGS = {"en", "nl"}
+SUPPORTED_LANGS = {"en", "nl"}
 _LOCALES_DIR = Path(__file__).parent.parent / "locales"
 _cache: dict[str, dict] = {}
 
 
 def _load(lang: str) -> dict:
-    if lang not in _SUPPORTED_LANGS:
+    if lang not in SUPPORTED_LANGS:
         raise ValueError(
-            f"Unsupported language: {lang!r}. Supported: {sorted(_SUPPORTED_LANGS)}"
+            f"Unsupported language: {lang!r}. Supported: {sorted(SUPPORTED_LANGS)}"
         )
     path = _LOCALES_DIR / f"{lang}.yaml"
     with path.open(encoding="utf-8") as f:

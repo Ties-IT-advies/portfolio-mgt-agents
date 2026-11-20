@@ -140,7 +140,7 @@ Scans every tracked file (including `.docx` content) and reports any match. Exit
 - **Humans decide, agents assess.** No agent has Go/No-Go authority in Release 1.0. (DEC-001)
 - **Role descriptions are functional, not job titles.** The system must work for organizations of any size — a small org may combine several roles into one person. (DEC-003)
 - **English + Markdown, role-aware, checkbox/fill-in-the-blank format** for all templates, even though the source materials from ScripeConnect12 are in Dutch and Word/PowerPoint. (DEC-004)
-- **No client-identifying examples** (e.g. the Feyenoord references present in ScripeConnect12's original source RTF) in anything we produce.
+- **No client-identifying examples** (e.g. client-specific references present in ScripeConnect12's original source RTF) in anything we produce.
 
 ## Updating the Decision Log
 

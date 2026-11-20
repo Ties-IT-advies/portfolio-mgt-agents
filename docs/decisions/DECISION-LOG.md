@@ -110,7 +110,7 @@ Full role descriptions (who they are, when they interact, what they need from th
 - Steering Group structure follows ScripeConnect12's standard PRINCE2-style model: Opdrachtgever, Senior User, Senior Supplier
 - The three governance tiers (Portfolio Board → Steering Group → Execution) preserve clear accountability and decision authority at each level
 - Role descriptions define functional needs, not job titles — organizations of any size can combine or split roles as needed
-- Client-specific examples (e.g. Feyenoord) from ScripeConnect12's source material were generalized/removed from our documentation
+- Client-specific examples from ScripeConnect12's source material were generalized/removed from our documentation
 
 **Status:** Role structure is defined; open questions on advisor-vs-user role separation, access/permission model, and role-specific dashboards remain tracked in `roles-and-personas.md` under "Questions for Refinement."
 
@@ -140,7 +140,7 @@ ScripeConnect12's templates reflect real, field-tested governance documents alre
 
 **Result:** `templates/execution-templates.md` contains 9 primary templates + 2 supporting templates, each mapped to a lifecycle phase and to the primary role(s) who use it. New templates created to cover gaps versus ScripeConnect12's set: Project Brief, Project Initiation Document (PID), Project Start Architecture, Go/No-Go Decision, Change Request.
 
-**Note:** All references to the Feyenoord client example present in ScripeConnect12's source material were removed from our derived documentation, per explicit instruction.
+**Note:** All client-specific references present in ScripeConnect12's source material were removed from our derived documentation, per explicit instruction.
 
 ---
 

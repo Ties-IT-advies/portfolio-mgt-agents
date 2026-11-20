@@ -2,10 +2,19 @@
 import importlib.util
 from pathlib import Path
 
+import yaml
 from docx import Document
 
 _SCRIPTS = Path(__file__).parent.parent / "skill" / "idea-gate" / "scripts"
 _FIXTURES = Path(__file__).parent / "fixtures"
+_SAMPLES_DIR = _FIXTURES / "samples"
+
+_V12_FIELD_IDS = [
+    "prepared_by", "date", "status",
+    "background", "objective", "sponsor", "people_involved",
+    "costs", "budget", "benefits", "timelines", "risks",
+    "strategic_contribution", "departments_involved", "complexity",
+]
 
 
 def _load_module():
@@ -33,21 +42,27 @@ def test_sample_header_fields():
 
 
 def test_sample_all_12_body_answers():
-    body_ids = [
-        "background", "objective", "sponsor", "people_involved",
-        "costs", "budget", "benefits", "timelines", "risks",
-        "strategic_contribution", "departments_involved", "complexity",
-    ]
+    with (_SAMPLES_DIR / "sample.yaml").open(encoding="utf-8") as f:
+        expected = yaml.safe_load(f)
+
     result = extract_mod.extract(_FIXTURES / "idea-v12-sample.docx")
-    for fid in body_ids:
-        assert fid in result["fields"], f"Missing field: {fid}"
-        assert result["fields"][fid] != "", f"Empty answer for field: {fid}"
+
+    for fid, value in expected.get("header", {}).items():
+        assert result["fields"].get(fid) == value, (
+            f"Header field {fid!r}: expected {value!r}, got {result['fields'].get(fid)!r}"
+        )
+    for fid, value in expected.get("body", {}).items():
+        assert result["fields"].get(fid) == value, (
+            f"Body field {fid!r}: expected {value!r}, got {result['fields'].get(fid)!r}"
+        )
 
 
 def test_blank_all_answers_empty():
     result = extract_mod.extract(_FIXTURES / "idea-v12-blank.docx")
-    for fid, answer in result["fields"].items():
-        assert answer == "", f"Expected empty for {fid!r}, got {answer!r}"
+    for fid in _V12_FIELD_IDS:
+        assert fid in result["fields"], f"Field {fid!r} missing from blank extraction"
+    for fid in _V12_FIELD_IDS:
+        assert result["fields"][fid] == "", f"Expected empty for {fid!r}, got {result['fields'][fid]!r}"
 
 
 def test_blank_project_name_empty():

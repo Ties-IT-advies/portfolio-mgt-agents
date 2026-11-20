@@ -1,0 +1,7 @@
+# Local config for portfolio-mgt-agents.
+# Copy to ~/.portfolio-mgt-agents/config.yaml and fill in real values locally.
+# This file contains placeholder values only — never commit real organization data.
+
+investment_threshold_eur: 0  # set locally: minimum EUR value to route through idea gate
+organization_name: ""        # set locally: used in report headers
+default_locale: en           # en or nl

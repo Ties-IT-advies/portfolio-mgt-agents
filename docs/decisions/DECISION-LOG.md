@@ -110,7 +110,7 @@ Full role descriptions (who they are, when they interact, what they need from th
 - Steering Group structure follows ScripeConnect12's standard PRINCE2-style model: Opdrachtgever, Senior User, Senior Supplier
 - The three governance tiers (Portfolio Board → Steering Group → Execution) preserve clear accountability and decision authority at each level
 - Role descriptions define functional needs, not job titles — organizations of any size can combine or split roles as needed
-- Client-specific examples (e.g. Feyenoord) from ScripeConnect12's source material were generalized/removed from our documentation
+- Client-specific examples from ScripeConnect12's source material were generalized/removed from our documentation
 
 **Status:** Role structure is defined; open questions on advisor-vs-user role separation, access/permission model, and role-specific dashboards remain tracked in `roles-and-personas.md` under "Questions for Refinement."
 
@@ -140,7 +140,7 @@ ScripeConnect12's templates reflect real, field-tested governance documents alre
 
 **Result:** `templates/execution-templates.md` contains 9 primary templates + 2 supporting templates, each mapped to a lifecycle phase and to the primary role(s) who use it. New templates created to cover gaps versus ScripeConnect12's set: Project Brief, Project Initiation Document (PID), Project Start Architecture, Go/No-Go Decision, Change Request.
 
-**Note:** All references to the Feyenoord client example present in ScripeConnect12's source material were removed from our derived documentation, per explicit instruction.
+**Note:** All client-specific references present in ScripeConnect12's source material were removed from our derived documentation, per explicit instruction.
 
 ---
 
@@ -188,6 +188,27 @@ Promote the Project Idea Submission Template to v12 by adding three fields (`str
 - Add three checklist items to the existing template — Denied (wrong actor model; misaligns with the Word template)
 - Add three fields directly to the Markdown template without a registry — Denied (downstream work would hard-code labels)
 - **Registry + locale design with v12 Markdown template rebuild — CHOSEN**
+
+---
+
+## Entry 7
+
+**Decision ID:** DEC-007
+**Topic:** Separation of `./check` (offline) and `./eval` (model-driven)
+**Status:** Approved
+
+**Decision Made:**
+`./check` is the CI gate: offline, deterministic, runs on every PR. It covers scripts, validators, and committed fixtures, but never calls the model. `./eval` is the separate evaluation harness: invokes Claude Code headless on every `.docx` fixture, validates each result against the schema validator, and reports a V1 pass rate. `./eval` is run by the Portfolio Manager; it is never invoked by CI.
+
+**Rationale:**
+- **No API key in CI.** Calling the model from CI would require a stable API key in the repo or secrets, introduce non-determinism, and add latency/cost to every PR check.
+- **Separation of concerns.** `./check` answers "is the code correct?"; `./eval` answers "does the skill produce valid output on real fixtures?". These are different questions on different cadences.
+- **Verification path for V1 and V4.** V1 (KR 1.2 — every field rated with quoted evidence) and V4 (KR 1.3 — repeat runs for stability) are both verified by running `./eval`, not by CI. The Portfolio Manager runs `./eval` after meaningful skill changes.
+
+**Implications:**
+- `./check` and `.github/workflows/ci.yml` must not call `./eval`.
+- `./eval --runs N` stores N result sets per fixture in `.eval-out/<timestamp>/`; comparison logic is out of scope for V1 (deferred to KR 1.3).
+- KR 1.2 is verified via `./eval`, not via a CI status check.
 
 ---
 

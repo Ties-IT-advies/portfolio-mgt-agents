@@ -1,4 +1,4 @@
-"""Generate v12 Project Idea .docx fixtures from the field registry and Dutch locale."""
+"""Generate v12 Project Idea .docx fixtures from the field registry and locale files."""
 
 import datetime
 import io
@@ -11,13 +11,15 @@ from docx.shared import Pt
 
 REPO_ROOT = pathlib.Path(__file__).parent.parent.parent
 FIELDS_PATH = REPO_ROOT / "skill" / "idea-gate" / "fields.yaml"
-LOCALE_PATH = REPO_ROOT / "skill" / "idea-gate" / "locales" / "nl.yaml"
+_LOCALE_DIR = REPO_ROOT / "skill" / "idea-gate" / "locales"
 OUT_DIR = pathlib.Path(__file__).parent
 SAMPLES_DIR = pathlib.Path(__file__).parent / "samples"
 
 FIXED_AUTHOR = "hall-of-automata"
 FIXED_DATE = datetime.datetime(2024, 1, 1, tzinfo=datetime.timezone.utc)
 FIXED_ZIP_TIME = (2024, 1, 1, 0, 0, 0)
+
+_TITLE_PREFIXES = {"nl": "Project IDEE:", "en": "Project IDEA:"}
 
 
 def load_yaml(path):
@@ -37,9 +39,9 @@ def set_core_properties(doc):
     props.modified = FIXED_DATE
 
 
-def add_title(doc, project_name):
+def add_title(doc, project_name, title_prefix="Project IDEE:"):
     p = doc.add_paragraph()
-    run = p.add_run(f"Project IDEE: {project_name}")
+    run = p.add_run(f"{title_prefix} {project_name}")
     run.bold = True
     run.font.size = Pt(16)
 
@@ -65,12 +67,12 @@ def build_strategic_contribution(locale_fields, picks):
     return "\n".join(lines)
 
 
-def build_document(registry, locale, project_name, header_values, body_values):
+def build_document(registry, locale, project_name, header_values, body_values, title_prefix="Project IDEE:"):
     header_fields = get_v12_fields(registry, "header")
     body_fields = get_v12_fields(registry, "body")
     doc = Document()
     set_core_properties(doc)
-    add_title(doc, project_name)
+    add_title(doc, project_name, title_prefix)
     header_rows = [(locale[f["id"]]["label"], header_values.get(f["id"], "")) for f in header_fields]
     add_table(doc, header_rows)
     doc.add_paragraph()
@@ -100,7 +102,7 @@ def save_deterministic(doc, path):
     normalize_zip_timestamps(path)
 
 
-def build_sample_document(registry, locale, sample):
+def build_sample_document(registry, locale, sample, title_prefix="Project IDEE:"):
     picks = [
         (p["objective"], p["index"], p.get("explanation", ""))
         for p in sample.get("strategic_picks", [])
@@ -114,20 +116,24 @@ def build_sample_document(registry, locale, sample):
         sample.get("project_name", ""),
         sample.get("header", {}),
         body,
+        title_prefix,
     )
 
 
 def main():
     registry = load_yaml(FIELDS_PATH)["fields"]
-    locale = load_yaml(LOCALE_PATH)["fields"]
+    nl_locale = load_yaml(_LOCALE_DIR / "nl.yaml")["fields"]
 
-    blank = build_document(registry, locale, "", {}, {})
+    blank = build_document(registry, nl_locale, "", {}, {})
     save_deterministic(blank, OUT_DIR / "idea-v12-blank.docx")
 
     generated = ["idea-v12-blank.docx"]
     for sample_path in sorted(SAMPLES_DIR.glob("*.yaml")):
         sample = load_yaml(sample_path)
-        doc = build_sample_document(registry, locale, sample)
+        locale_code = sample.get("locale", "nl")
+        locale = load_yaml(_LOCALE_DIR / f"{locale_code}.yaml")["fields"]
+        title_prefix = _TITLE_PREFIXES.get(locale_code, "Project IDEE:")
+        doc = build_sample_document(registry, locale, sample, title_prefix)
         out_name = f"idea-v12-{sample_path.stem}.docx"
         save_deterministic(doc, OUT_DIR / out_name)
         generated.append(out_name)

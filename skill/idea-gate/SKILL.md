@@ -8,7 +8,7 @@ description: Assess a submitted Project Idea .docx — rate every field against 
 Assess a submitted Project Idea document. Never edit the input `.docx`.
 
 All scripts live in `skill/idea-gate/scripts/`. Install dependencies if needed:
-`pip install python-docx pyyaml`.
+`python -m pip install -r requirements-dev.txt`.
 
 ---
 
@@ -30,24 +30,24 @@ Write the JSON to `<name>.answers.json` next to the input file.
 
 ## Step 2 — Detect language
 
-Concatenate all non-empty values from `fields` with a single space. Pass that
-string to `detect_language`:
+Run `detect_language.py` on the answers JSON:
 
-```python
-from skill.idea_gate.scripts.detect_language import detect_language
-combined = " ".join(v for v in answers["fields"].values() if v.strip())
-lang = detect_language(combined)
+```bash
+python skill/idea-gate/scripts/detect_language.py <name>.answers.json
 ```
 
-If the result is `"unknown"`, ask the user:
+Capture the output as `lang` (`nl`, `en`, or `unknown`).
+
+If `lang` is `unknown`, ask the user:
 > "Could not detect the document language automatically. Is this English (`en`) or Dutch (`nl`)?"
 
-Use the confirmed value as `language` in the assessment.
+Re-run with the confirmed value:
 
-<!-- KR 1.4 / V7 — Uncertainty rule: not yet implemented -->
-> **[KR 1.4 — pending]** When a field cannot be reliably rated, apply
-> `point_of_attention` and note the uncertainty in the reason. Full spec
-> pending KR 1.4.
+```bash
+python skill/idea-gate/scripts/detect_language.py <name>.answers.json --override en
+```
+
+Use the final output as `language` in the assessment.
 
 ---
 
@@ -82,6 +82,9 @@ For each body field, following `skill/idea-gate/rubric.md`:
 
 Store the rating as a locale key — `sufficient`, `point_of_attention`, or
 `insufficient` — never as the display string.
+
+<!-- KR 1.4 / V7 — Uncertainty rule: not yet implemented -->
+> **[KR 1.4 — pending]** Uncertainty rule pending KR 1.4.
 
 ---
 
@@ -134,9 +137,8 @@ Present a Markdown table — one row per rated field.
 | Field | Rating | Quote | Reason |
 |-------|--------|-------|--------|
 
-- **Field**: `i18n.text("fields.<id>.label", language)` from
-  `skill/idea-gate/scripts/i18n.py`.
-- **Rating**: `i18n.text("ratings.<rating>", language)`.
+- **Field**: run `python skill/idea-gate/scripts/i18n.py fields.<id>.label <language>`.
+- **Rating**: run `python skill/idea-gate/scripts/i18n.py ratings.<rating> <language>`.
 - **Quote**: the verbatim excerpt, or `—` when null.
 - **Reason**: the reason from the assessment.
 

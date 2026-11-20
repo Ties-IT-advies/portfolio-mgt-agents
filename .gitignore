@@ -7,3 +7,5 @@ calibration/
 *.local.yaml
 denylist.txt
 .portfolio-mgt-agents/
+*.answers.json
+*.assessment.json

@@ -50,17 +50,17 @@ portfolio-management-agents/
 
 ## Available Skills
 
-Skills are stored under `skill/` and symlinked into `.claude/skills/` so Claude
-Code discovers them when the repo is opened.
+Skills are stored under `skill/`. Each skill has a stub at
+`.claude/skills/<name>/SKILL.md` that tells Claude Code where to find the actual
+skill, so Claude Code discovers them automatically when the repo is opened.
 
 | Skill | Trigger | Location |
 |-------|---------|----------|
 | `idea-gate` | Assess a Project Idea `.docx` | `skill/idea-gate/` |
 
-**Windows note:** the `.claude/skills/idea-gate` entry is a symlink. On Windows,
-enable Developer Mode (Settings → Developer → Developer Mode) or run your shell
-with administrator rights so that Git can materialise symlinks on checkout. On
-Linux and macOS this works without additional setup.
+**Discovery:** `.claude/skills/idea-gate/SKILL.md` is a stub that tells Claude
+Code to load `skill/idea-gate/SKILL.md`. No special setup required on any
+platform.
 
 To assess an idea document:
 1. Open this repo in Claude Code.

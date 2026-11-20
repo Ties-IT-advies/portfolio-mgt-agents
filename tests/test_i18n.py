@@ -1,5 +1,6 @@
 """Tests for the locale loader."""
 import importlib.util
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -76,3 +77,23 @@ def test_unsupported_language_raises():
 def test_non_string_key_raises():
     with pytest.raises(KeyError, match="non-string"):
         i18n_mod.text("fields.strategic_contribution.objectives", "en")
+
+
+def test_cli_prints_en_string():
+    result = subprocess.run(
+        ["python", str(_SCRIPTS / "i18n.py"), "ratings.sufficient", "en"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "Sufficient"
+
+
+def test_cli_prints_nl_string():
+    result = subprocess.run(
+        ["python", str(_SCRIPTS / "i18n.py"), "ratings.sufficient", "nl"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "Voldoende"

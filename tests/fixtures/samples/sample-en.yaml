@@ -1,0 +1,29 @@
+# Sample: strong — fully completed idea with measures, individual sponsor and three mitigated risks.
+locale: en
+project_name: "Digital Customer Portal"
+header:
+  prepared_by: "J. de Vries, Project Manager"  # quality: strong
+  date: "2024-01-15"                            # quality: strong
+  status: "Concept"                             # quality: strong
+body:
+  background: "Customers of Verbogen BV can currently only get in touch by phone or email. This leads to long waiting times and high administrative burden. A digital customer portal offers self-service and reduces the number of manual operations by ~40%."  # quality: strong
+  objective: "The objective is to have a self-service portal live for 500 customers by Q3 2024. Success measure: 80% of standard customer queries handled without human intervention."  # quality: strong
+  sponsor: "M. Bakker, Director Customer Experience"  # quality: strong
+  people_involved: "Project Manager: S. Jansen (IT). Subject-matter expert: R. Hoekstra (Customer Service). Content owner: L. Smits (Marketing)."  # quality: strong
+  costs: "Internal capacity: 320 hours over 6 months (analyst + developer). Project costs: €45,000 realisation, €8,000/year maintenance. Assumption: SaaS platform licence costs €12,000/year."  # quality: strong
+  budget: "€57,000 available from the IT innovation fund 2024. Director approval received on 10-01-2024."  # quality: strong
+  benefits: "€30,000/year savings on customer service FTE; NPS improvement expected of +8 points. Downside: initial resistance from customer service staff (change management required)."  # quality: strong
+  timelines: "Start: February 2024. Milestones: prototype ready April 2024, pilot 50 customers May 2024, go-live July 2024. Planning confidence level: medium (dependent on vendor availability)."  # quality: strong
+  risks: |-  # quality: strong
+    1. Vendor delay — mitigation: contractual deadline, alternative vendor identified; owner: S. Jansen.
+    2. Low customer adoption — mitigation: communication campaign + onboarding tour; owner: L. Smits.
+    3. Data disruption during customer data migration — mitigation: test migration round + rollback procedure; owner: R. Hoekstra.
+  departments_involved: "IT, Customer Service, Marketing. Multiple departments involved — project classification: cross-functional."  # quality: strong
+  complexity: "Estimate: Medium. Technical: standard SaaS integration, limited customisation. Organisational: three departments, change management required. Dependencies: vendor selection not yet finalised."  # quality: strong
+strategic_picks:
+  - objective: operational_excellence
+    index: 3
+    explanation: ""  # quality: strong
+  - objective: revenue_growth
+    index: 3
+    explanation: ""  # quality: strong

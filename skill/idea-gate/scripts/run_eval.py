@@ -1,6 +1,6 @@
 """Evaluate the idea-gate skill on fixture .docx files.
 
-CLI: python run_eval.py [--fixture GLOB] [--runs N]
+CLI: python run_eval.py [--fixture GLOB] [--runs N] [--pairs]
 Library: from run_eval import run_eval
 """
 import argparse
@@ -29,6 +29,16 @@ def _load_validate():
 
 
 _validate = _load_validate()
+
+
+def _load_run_pairs():
+    spec = importlib.util.spec_from_file_location(
+        "run_pairs",
+        Path(__file__).parent / "run_pairs.py",
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
 
 
 def default_runner(fixture_path: Path) -> tuple[dict, dict]:
@@ -147,16 +157,31 @@ def main() -> int:
         metavar="N",
         help="Runs per fixture (default: %(default)s)",
     )
+    parser.add_argument(
+        "--pairs",
+        action="store_true",
+        help="Compare language pairs from tests/fixtures/pairs.yaml",
+    )
     args = parser.parse_args()
+
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    out_dir = _EVAL_OUT_DIR / timestamp
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.pairs:
+        rp = _load_run_pairs()
+        pairs_path = _REPO_ROOT / "tests" / "fixtures" / "pairs.yaml"
+        pairs = rp.load_pairs(pairs_path)
+        results = rp.run_pairs(pairs, default_runner, out_dir)
+        (out_dir / "pairs-report.json").write_text(
+            json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+        return rp.report_pairs(results)
 
     fixture_paths = sorted(_REPO_ROOT.glob(args.fixture))
     if not fixture_paths:
         print(f"No fixtures found for: {args.fixture}", file=sys.stderr)
         return 1
-
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out_dir = _EVAL_OUT_DIR / timestamp
-    out_dir.mkdir(parents=True, exist_ok=True)
 
     results = run_eval(fixture_paths, args.runs, out_dir=out_dir)
 

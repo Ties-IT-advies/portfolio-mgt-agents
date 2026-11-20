@@ -95,7 +95,12 @@ proof for KR 1.2. It is not called by CI.
 ```
 
 Results are written to `.eval-out/<timestamp>/` (git-ignored). Exit code is
-0 only when every fixture validates without violations.
+0 only when every fixture validates without violations. Each fixture run
+times out after 600 seconds.
+
+`./eval` invokes `claude` with
+`--allowedTools Read,Write,Bash(python skill/idea-gate/scripts/*)` —
+only the tools the skill actually needs. No additional permissions are required.
 
 **Note:** `./eval` requires the invoker's own Claude Code login — no API key
 is stored in the repo. Run `chmod +x eval` after cloning if the execute bit

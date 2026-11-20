@@ -4,6 +4,8 @@ import json
 import tempfile
 from pathlib import Path
 
+import pytest
+
 _SCRIPTS = Path(__file__).parent.parent / "skill" / "idea-gate" / "scripts"
 
 _V12_FIELDS = [
@@ -146,7 +148,7 @@ def test_report_all_pass(capsys):
     code = _mod._report(results)
     assert code == 0
     out = capsys.readouterr().out
-    assert "V1: 2/2 fixtures valid" in out
+    assert "V1: 2/2 runs valid" in out
 
 
 def test_report_partial_fail(capsys):
@@ -157,5 +159,31 @@ def test_report_partial_fail(capsys):
     code = _mod._report(results)
     assert code == 1
     out = capsys.readouterr().out
-    assert "V1: 1/2 fixtures valid" in out
+    assert "V1: 1/2 runs valid" in out
     assert "FAIL" in out
+
+
+def test_default_runner_stale_file_rejected(tmp_path, monkeypatch):
+    fixture = tmp_path / "idea-v12-sample.docx"
+    fixture.touch()
+    stale_assessment = tmp_path / "idea-v12-sample.assessment.json"
+    stale_assessment.write_text('{"stale": true}', encoding="utf-8")
+
+    captured = []
+
+    class _FakeResult:
+        returncode = 0
+        stderr = ""
+
+    def _fake_run(cmd, **kwargs):
+        captured.append({"cmd": list(cmd), "kwargs": kwargs})
+        return _FakeResult()
+
+    monkeypatch.setattr(_mod.subprocess, "run", _fake_run)
+
+    with pytest.raises(RuntimeError, match="not written"):
+        _mod.default_runner(fixture)
+
+    assert len(captured) == 1
+    assert "--allowedTools" in captured[0]["cmd"]
+    assert "cwd" in captured[0]["kwargs"]

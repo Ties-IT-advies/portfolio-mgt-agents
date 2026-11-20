@@ -14,6 +14,8 @@ from pathlib import Path
 _REPO_ROOT = Path(__file__).parent.parent.parent.parent
 _DEFAULT_FIXTURE_GLOB = "tests/fixtures/*.docx"
 _EVAL_OUT_DIR = _REPO_ROOT / ".eval-out"
+_RUN_TIMEOUT_S = 600
+_ALLOWED_TOOLS = "Read,Write,Bash(python skill/idea-gate/scripts/*)"
 
 
 def _load_validate():
@@ -31,18 +33,29 @@ _validate = _load_validate()
 
 def default_runner(fixture_path: Path) -> tuple[dict, dict]:
     """Call claude headless on fixture_path; return (assessment, answers)."""
-    result = subprocess.run(
-        ["claude", "-p", f"Assess {fixture_path}", "--output-format", "json"],
-        capture_output=True,
-        text=True,
-    )
+    stem = fixture_path.stem
+    assessment_path = fixture_path.parent / f"{stem}.assessment.json"
+    answers_path = fixture_path.parent / f"{stem}.answers.json"
+    assessment_path.unlink(missing_ok=True)
+    answers_path.unlink(missing_ok=True)
+    try:
+        result = subprocess.run(
+            [
+                "claude", "-p", f"Assess {fixture_path}",
+                "--output-format", "json",
+                "--allowedTools", _ALLOWED_TOOLS,
+            ],
+            capture_output=True,
+            text=True,
+            cwd=_REPO_ROOT,
+            timeout=_RUN_TIMEOUT_S,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError(f"claude timed out after {_RUN_TIMEOUT_S}s")
     if result.returncode != 0:
         raise RuntimeError(
             f"claude exited {result.returncode}: {result.stderr.strip()}"
         )
-    stem = fixture_path.stem
-    assessment_path = fixture_path.parent / f"{stem}.assessment.json"
-    answers_path = fixture_path.parent / f"{stem}.answers.json"
     if not assessment_path.exists():
         raise RuntimeError(f"assessment file not written: {assessment_path.name}")
     if not answers_path.exists():
@@ -113,7 +126,7 @@ def _report(results: list[dict]) -> int:
             line = f"FAIL {n} violation{'s' if n != 1 else ''}"
         print(f"{r['fixture']} (run {r['run']}): {line}")
     total = len(results)
-    print(f"\nV1: {passed}/{total} fixtures valid")
+    print(f"\nV1: {passed}/{total} runs valid")
     return 0 if passed == total else 1
 
 

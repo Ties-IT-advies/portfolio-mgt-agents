@@ -128,13 +128,19 @@ def scan_all(pattern: re.Pattern, locations_only: bool = False) -> list[str]:
 
 def scan_push(git_range: str, pattern: re.Pattern, locations_only: bool = False) -> list[str]:
     hits = []
+    head_sha = git_range.split("..")[-1]
+    names = get_changed_filenames(git_range)
+    labels = {}
+    for idx, name in enumerate(names, 1):
+        name_hits = bool(pattern.search(name))
+        labels[name] = f"[redacted path: changed file #{idx}]" if (locations_only and name_hits) else name
     for fname, lineno, content in parse_added_lines(git_range):
         if pattern.search(content):
-            hits.append(text_hit(fname, lineno, content, locations_only))
-    head_sha = git_range.split("..")[-1]
-    for idx, name in enumerate(get_changed_filenames(git_range), 1):
+            label = labels.get(fname, fname)
+            hits.append(text_hit(label, lineno, content, locations_only))
+    for name in names:
         name_hits = bool(pattern.search(name))
-        label = f"[redacted path: changed file #{idx}]" if (locations_only and name_hits) else name
+        label = labels[name]
         if name_hits:
             hits.append(label if locations_only else f"[filename]: {name}")
         if name.lower().endswith(".docx"):
@@ -161,6 +167,10 @@ def _load_terms(args: argparse.Namespace) -> list[str] | None:
 
 
 def main(argv=None) -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
     parser = argparse.ArgumentParser(description="Scan for org terms.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--push", metavar="RANGE", help="Scan added lines in git range")

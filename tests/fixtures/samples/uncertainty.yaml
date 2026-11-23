@@ -1,0 +1,31 @@
+# Sample: uncertainty (nl) — drie verklaarde onzekerheden (verwacht: point_of_attention)
+# en drie onverklaarde hiaten (verwacht: insufficient). Alle overige velden: duidelijk voldoende.
+# Bedoeld om het onderscheid te testen tussen een antwoord met schatting + reden (point_of_attention)
+# en een antwoord dat de reden of schatting volledig weglaat (insufficient).
+project_name: "Datamigratie Ledenadministratie"
+header:
+  prepared_by: "W. Brouwer, Projectleider"  # quality: strong
+  date: "2024-06-01"                         # quality: strong
+  status: "Concept"                          # quality: strong
+body:
+  background: "De ledenadministratie van Stichting Vitaal wordt beheerd in een verouderd systeem dat niet meer wordt ondersteund door de leverancier. Migratie naar een modern platform is noodzakelijk om continuïteit te borgen en GDPR-naleving te behouden."  # quality: sufficient
+  objective: "Het doel is de ledenadministratie volledig gemigreerd te hebben naar platform Nexus voor Q4 2024. Succesmaatstaf: 100% ledendossiers beschikbaar in Nexus, nul dataverlies geverifieerd via reconciliatieaudit."  # quality: sufficient
+  sponsor: "C. van Dijk, Directeur Operations"  # quality: sufficient
+  # quality: insufficient — kale placeholder zonder naam, functie of enige toelichting
+  people_involved: "Nog te bepalen."
+  # quality: point_of_attention — bandbreedte aanwezig én reden vermeld, maar geen mitigatie of eigenaar per kostenpost
+  costs: "Interne capaciteit: 160–240 uur (bandbreedte afhankelijk van datakwaliteit bestaand systeem). Licentiekosten Nexus: €9.000–€14.000/jaar; aanname: volumekorting van kracht bij meer dan 1.000 leden."
+  # quality: insufficient — kaal bereik zonder vermelding van budgetbron of formele status
+  budget: "Tussen €30.000 en €50.000."
+  # quality: point_of_attention — voordeel en tijdspad aanwezig, maar maatstaf is indicatief en downside ontbreekt
+  benefits: "Verwachte tijdsbesparing beheerders: circa 2 uur per week. Verbetering GDPR-naleving door toegangsbeheer. Exacte maatstaf wordt vastgesteld na inrichting van de rapportagemodule."
+  # quality: point_of_attention — startdatum en mijlpalen aanwezig, maar vertrouwensniveau laag en wordt toegelicht
+  timelines: "Beoogde start: augustus 2024. Mijlpalen: migratie testomgeving september 2024, acceptatietest oktober 2024, go-live november 2024. Vertrouwensniveau: laag — planning is afhankelijk van datakwaliteitsrapport dat nog wordt opgesteld."
+  # quality: insufficient — stelt onzekerheid vast maar geeft geen schatting, lijst of enige inhoud
+  risks: "Er zijn risico's rondom de datamigratiekwaliteit, maar die zijn op dit moment nog niet in kaart gebracht."
+  departments_involved: "Operations, IT, Ledenadministratie. Drie afdelingen betrokken — projectclassificatie: cross-functioneel."  # quality: sufficient
+  complexity: "Inschatting: Gemiddeld. Technisch: datamapping en validatie zijn arbeidsintensief. Organisatorisch: drie afdelingen, change management bij beheerders vereist. Afhankelijkheid: datakwaliteitsrapport bestaand systeem is nog niet beschikbaar."  # quality: sufficient
+strategic_picks:
+  - objective: operational_excellence
+    index: 0
+    explanation: "Migratie elimineert handmatige reconciliatie en maakt geautomatiseerde rapportage mogelijk."  # quality: sufficient

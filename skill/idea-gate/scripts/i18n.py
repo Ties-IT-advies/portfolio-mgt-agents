@@ -45,6 +45,8 @@ def text(key: str, lang: str) -> str:
 
 if __name__ == "__main__":
     import sys
+    from cli_utils import configure_utf8_streams
+    configure_utf8_streams()
 
     if len(sys.argv) != 3:
         print("Usage: python i18n.py <key> <lang>", file=sys.stderr)

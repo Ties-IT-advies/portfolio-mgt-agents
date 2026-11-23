@@ -187,3 +187,4 @@ def test_default_runner_stale_file_rejected(tmp_path, monkeypatch):
     assert len(captured) == 1
     assert "--allowedTools" in captured[0]["cmd"]
     assert "cwd" in captured[0]["kwargs"]
+    assert captured[0]["kwargs"].get("stdin") is _mod.subprocess.DEVNULL

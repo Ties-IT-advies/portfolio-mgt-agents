@@ -215,7 +215,11 @@ def test_default_runner_missing_files_includes_result_and_denials(tmp_path, monk
     stdout_data = json.dumps({
         "result": "I tried to write the file but could not.",
         "permission_denials": [
-            {"command": "python skill/idea-gate/scripts/extract_idea.py foo.docx --out foo.answers.json"}
+            {
+                "tool_name": "Bash",
+                "tool_use_id": "x",
+                "tool_input": {"command": "python skill/idea-gate/scripts/extract_idea.py foo.docx --out foo.answers.json"},
+            }
         ],
     })
 

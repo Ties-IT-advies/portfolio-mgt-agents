@@ -29,7 +29,11 @@ def format_missing_file_error(stdout: str) -> str:
         parts.append(f"result: {result_text[:_TRUNCATE_LEN]!r}")
     denials = data.get("permission_denials", [])
     if denials:
-        commands = [d["command"] for d in denials if isinstance(d, dict) and "command" in d]
+        commands = [
+            d["tool_input"]["command"]
+            for d in denials
+            if isinstance(d, dict) and isinstance(d.get("tool_input"), dict) and "command" in d["tool_input"]
+        ]
         if commands:
             parts.append(f"denied: {', '.join(commands)}")
     return "; ".join(parts) if parts else "(no result in output)"

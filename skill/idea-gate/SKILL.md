@@ -16,15 +16,22 @@ Run each command exactly as written; the eval harness only permits these command
 
 ## Step 1 — Extract answers
 
-Derive `<name>` as the input file's stem (no extension, no directory). Then run:
+For input `<dir>/<stem>.docx`, the output paths are:
+- answers file: `<dir>/<stem>.answers.json`
+- assessment file: `<dir>/<stem>.assessment.json`
+
+Both are the input path with `.docx` replaced, including the directory.
+
+**Worked example:** `tests/fixtures/idea-v12-weak.docx` → `tests/fixtures/idea-v12-weak.answers.json` and `tests/fixtures/idea-v12-weak.assessment.json`.
+
+Run:
 
 ```bash
-python skill/idea-gate/scripts/extract_idea.py <path/to/file.docx> --out <name>.answers.json
+python skill/idea-gate/scripts/extract_idea.py <dir>/<stem>.docx --out <dir>/<stem>.answers.json
 ```
 
 This writes a JSON object — `project_name`, `fields` (id → answer text),
-`unmatched_labels`, and `missing_fields` — to `<name>.answers.json` next to
-the input file.
+`unmatched_labels`, and `missing_fields` — to `<dir>/<stem>.answers.json`.
 
 ---
 
@@ -33,7 +40,7 @@ the input file.
 Run `detect_language.py` on the answers JSON:
 
 ```bash
-python skill/idea-gate/scripts/detect_language.py <name>.answers.json
+python skill/idea-gate/scripts/detect_language.py <dir>/<stem>.answers.json
 ```
 
 Capture the output as `lang` (`nl`, `en`, or `unknown`).
@@ -44,7 +51,7 @@ If `lang` is `unknown`, ask the user:
 Re-run with the confirmed value:
 
 ```bash
-python skill/idea-gate/scripts/detect_language.py <name>.answers.json --override en
+python skill/idea-gate/scripts/detect_language.py <dir>/<stem>.answers.json --override en
 ```
 
 Use the final output as `language` in the assessment.
@@ -90,7 +97,7 @@ Store the rating as a locale key — `sufficient`, `point_of_attention`, or
 
 ## Step 5 — Write assessment JSON
 
-Write the assessment to `<name>.assessment.json` next to the input file:
+Write the assessment to `<dir>/<stem>.assessment.json`:
 
 ```json
 {
@@ -119,7 +126,7 @@ for the detected version).
 ## Step 6 — Validate and self-correct
 
 ```bash
-python skill/idea-gate/scripts/validate_assessment.py <name>.assessment.json <name>.answers.json
+python skill/idea-gate/scripts/validate_assessment.py <dir>/<stem>.assessment.json <dir>/<stem>.answers.json
 ```
 
 If validation reports violations, fix the assessment JSON and re-run. Attempt

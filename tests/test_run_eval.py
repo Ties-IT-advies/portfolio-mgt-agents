@@ -1,6 +1,7 @@
 """Tests for run_eval.py using a fake runner (no model calls)."""
 import importlib.util
 import json
+import re
 import tempfile
 from pathlib import Path
 
@@ -174,6 +175,7 @@ def test_default_runner_stale_file_rejected(tmp_path, monkeypatch):
     class _FakeResult:
         returncode = 0
         stderr = ""
+        stdout = ""
 
     def _fake_run(cmd, **kwargs):
         captured.append({"cmd": list(cmd), "kwargs": kwargs})
@@ -188,3 +190,45 @@ def test_default_runner_stale_file_rejected(tmp_path, monkeypatch):
     assert "--allowedTools" in captured[0]["cmd"]
     assert "cwd" in captured[0]["kwargs"]
     assert captured[0]["kwargs"].get("stdin") is _mod.subprocess.DEVNULL
+
+
+def test_skill_md_no_bare_output_paths():
+    """Every bash command block in SKILL.md uses full paths (no bare stem placeholders)."""
+    skill_md = Path(__file__).parent.parent / "skill" / "idea-gate" / "SKILL.md"
+    content = skill_md.read_text(encoding="utf-8")
+    bash_blocks = re.findall(r"```bash\n(.*?)```", content, re.DOTALL)
+    violations = []
+    for block in bash_blocks:
+        for line in block.splitlines():
+            # Any .json token that has no '/' separator before it is a bare path
+            for token in line.split():
+                if token.endswith(".json") and "/" not in token:
+                    violations.append(line.strip())
+    assert not violations, f"Bare output paths in SKILL.md bash blocks: {violations}"
+
+
+def test_default_runner_missing_files_includes_result_and_denials(tmp_path, monkeypatch):
+    """When files are not written, error message includes Claude result and denied commands."""
+    fixture = tmp_path / "idea-v12-sample.docx"
+    fixture.touch()
+
+    stdout_data = json.dumps({
+        "result": "I tried to write the file but could not.",
+        "permission_denials": [
+            {"command": "python skill/idea-gate/scripts/extract_idea.py foo.docx --out foo.answers.json"}
+        ],
+    })
+
+    class _FakeResult:
+        returncode = 0
+        stderr = ""
+        stdout = stdout_data
+
+    monkeypatch.setattr(_mod.subprocess, "run", lambda *a, **kw: _FakeResult())
+
+    with pytest.raises(RuntimeError) as exc_info:
+        _mod.default_runner(fixture)
+
+    msg = str(exc_info.value)
+    assert "I tried to write the file but could not." in msg
+    assert "extract_idea.py foo.docx --out foo.answers.json" in msg

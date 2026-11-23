@@ -11,6 +11,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+
 _REPO_ROOT = Path(__file__).parent.parent.parent.parent
 _DEFAULT_FIXTURE_GLOB = "tests/fixtures/*.docx"
 _EVAL_OUT_DIR = _REPO_ROOT / ".eval-out"
@@ -18,27 +19,17 @@ _RUN_TIMEOUT_S = 600
 _ALLOWED_TOOLS = "Read,Write,Bash(python skill/idea-gate/scripts/*)"
 
 
-def _load_validate():
+def _load_module(name: str, filename: str):
     spec = importlib.util.spec_from_file_location(
-        "validate_assessment",
-        Path(__file__).parent / "validate_assessment.py",
-    )
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod.validate
-
-
-_validate = _load_validate()
-
-
-def _load_run_pairs():
-    spec = importlib.util.spec_from_file_location(
-        "run_pairs",
-        Path(__file__).parent / "run_pairs.py",
+        name, Path(__file__).parent / filename
     )
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
+
+
+_validate = _load_module("validate_assessment", "validate_assessment.py").validate
+_eval_helpers = _load_module("eval_helpers", "eval_helpers.py")
 
 
 def default_runner(fixture_path: Path) -> tuple[dict, dict]:
@@ -67,10 +58,10 @@ def default_runner(fixture_path: Path) -> tuple[dict, dict]:
         raise RuntimeError(
             f"claude exited {result.returncode}: {result.stderr.strip()}"
         )
-    if not assessment_path.exists():
-        raise RuntimeError(f"assessment file not written: {assessment_path.name}")
-    if not answers_path.exists():
-        raise RuntimeError(f"answers file not written: {answers_path.name}")
+    if not assessment_path.exists() or not answers_path.exists():
+        missing = ", ".join(p.name for p in (assessment_path, answers_path) if not p.exists())
+        detail = _eval_helpers.format_missing_file_error(result.stdout)
+        raise RuntimeError(f"file(s) not written: {missing} — {detail}")
     with assessment_path.open(encoding="utf-8") as f:
         assessment = json.load(f)
     with answers_path.open(encoding="utf-8") as f:
@@ -173,7 +164,7 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     if args.pairs:
-        rp = _load_run_pairs()
+        rp = _eval_helpers.load_run_pairs()
         pairs_path = _REPO_ROOT / "tests" / "fixtures" / "pairs.yaml"
         pairs = rp.load_pairs(pairs_path)
         results = rp.run_pairs(pairs, default_runner, out_dir)

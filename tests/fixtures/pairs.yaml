@@ -1,3 +1,5 @@
 pairs:
   - nl: idea-v12-sample.docx
     en: idea-v12-sample-en.docx
+  - nl: idea-v12-uncertainty.docx
+    en: idea-v12-uncertainty-en.docx

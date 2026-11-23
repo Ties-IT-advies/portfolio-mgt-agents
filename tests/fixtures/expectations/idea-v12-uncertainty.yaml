@@ -1,0 +1,7 @@
+fields:
+  costs: point_of_attention
+  timelines: point_of_attention
+  benefits: point_of_attention
+  budget: insufficient
+  people_involved: insufficient
+  risks: insufficient

@@ -1,0 +1,31 @@
+# Sample: uncertainty (en) — three explained uncertainties (expected: point_of_attention)
+# and three unexplained gaps (expected: insufficient). All other fields: clearly sufficient.
+# Mirrors uncertainty.yaml in English. Tests the same explained-vs-unexplained distinction.
+locale: en
+project_name: "Member Registry Data Migration"
+header:
+  prepared_by: "W. Brouwer, Project Manager"  # quality: strong
+  date: "2024-06-01"                           # quality: strong
+  status: "Concept"                            # quality: strong
+body:
+  background: "The member registry of Stichting Vitaal is managed in a legacy system that is no longer supported by the vendor. Migration to a modern platform is required to ensure continuity and maintain GDPR compliance."  # quality: sufficient
+  objective: "The objective is to have the member registry fully migrated to platform Nexus by Q4 2024. Success measure: 100% of member records available in Nexus, zero data loss verified through a reconciliation audit."  # quality: sufficient
+  sponsor: "C. van Dijk, Director Operations"  # quality: sufficient
+  # quality: insufficient — bare placeholder with no name, role or any further detail
+  people_involved: "To be determined."
+  # quality: point_of_attention — bandwidth present and reason stated, but no mitigation or owner per cost item
+  costs: "Internal capacity: 160–240 hours (bandwidth depends on data quality of existing system). Nexus licence: €9,000–€14,000/year; assumption: volume discount applies above 1,000 members."
+  # quality: insufficient — bare range with no budget source or formal approval status mentioned
+  budget: "Between €30,000 and €50,000."
+  # quality: point_of_attention — benefit and timeframe present, but measure is indicative and downside absent
+  benefits: "Expected time saving for administrators: approximately 2 hours per week. Improved GDPR compliance through access controls. Exact measure to be determined after the reporting module is set up."
+  # quality: point_of_attention — start date and milestones present, but confidence level is low and reason is given
+  timelines: "Target start: August 2024. Milestones: test environment migration September 2024, acceptance test October 2024, go-live November 2024. Confidence level: low — schedule depends on a data-quality report that has not yet been produced."
+  # quality: insufficient — states uncertainty without any estimate, list or substantive content
+  risks: "There are risks around data migration quality, but these have not yet been mapped out."
+  departments_involved: "Operations, IT, Member Administration. Three departments involved — project classification: cross-functional."  # quality: sufficient
+  complexity: "Estimate: Medium. Technical: data mapping and validation are labour-intensive. Organisational: three departments, change management required for administrators. Dependency: data-quality report for existing system not yet available."  # quality: sufficient
+strategic_picks:
+  - objective: operational_excellence
+    index: 0
+    explanation: "Migration eliminates manual reconciliation and enables automated reporting."  # quality: sufficient

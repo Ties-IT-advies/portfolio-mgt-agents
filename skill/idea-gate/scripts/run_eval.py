@@ -132,26 +132,13 @@ def _report(results: list[dict]) -> int:
             n = len(r["violations"])
             line = f"FAIL {n} violation{'s' if n != 1 else ''}"
         print(f"{r['fixture']} (run {r['run']}): {line}")
-        exp = r.get("expectations")
-        if exp is not None:
-            print(
-                f"  V7 {exp['ratings_matched']}/{exp['ratings_total']} ratings, "
-                f"{exp['questions_ok']}/{exp['questions_total']} questioned"
-            )
-            for m in exp["mismatches"]:
-                print(f"    {m}")
-    total = len(results)
-    print(f"\nV1: {passed}/{total} runs valid")
-    v7_runs = [r for r in results if r.get("expectations") is not None]
-    v7_ok = True
-    if v7_runs:
-        rm = sum(r["expectations"]["ratings_matched"] for r in v7_runs)
-        rt = sum(r["expectations"]["ratings_total"] for r in v7_runs)
-        qo = sum(r["expectations"]["questions_ok"] for r in v7_runs)
-        qt = sum(r["expectations"]["questions_total"] for r in v7_runs)
-        print(f"V7: {rm}/{rt} ratings matched, {qo}/{qt} questioned")
-        v7_ok = rm == rt and qo == qt
-    return 0 if passed == total and v7_ok else 1
+        if r.get("expectations") is not None:
+            print(_eval_expectations.format_run_v7(r["expectations"]))
+    print(f"\nV1: {passed}/{len(results)} runs valid")
+    v7_line, v7_ok = _eval_expectations.summarize(results)
+    if v7_line:
+        print(v7_line)
+    return 0 if passed == len(results) and v7_ok else 1
 
 
 def main() -> int:

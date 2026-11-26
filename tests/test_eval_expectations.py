@@ -102,3 +102,30 @@ def test_question_present_passes():
     assert result["questions_ok"] == 1
     assert result["questions_total"] == 1
     assert result["mismatches"] == []
+
+
+def test_summarize_no_v7_runs():
+    """No runs with expectations → no V7 line and ok=True."""
+    results = [{"fixture": "a.docx", "run": 1, "passed": True, "violations": [], "expectations": None}]
+    line, ok = _mod.summarize(results)
+    assert line is None
+    assert ok is True
+
+
+def test_summarize_two_runs_aggregate():
+    """Two runs with expectations aggregate correctly."""
+    run1_exp = {
+        "ratings_matched": 2, "ratings_total": 2,
+        "questions_ok": 1, "questions_total": 1, "mismatches": [],
+    }
+    run2_exp = {
+        "ratings_matched": 1, "ratings_total": 2,
+        "questions_ok": 0, "questions_total": 1, "mismatches": ["foo"],
+    }
+    results = [
+        {"fixture": "a.docx", "run": 1, "passed": True, "violations": [], "expectations": run1_exp},
+        {"fixture": "a.docx", "run": 2, "passed": True, "violations": [], "expectations": run2_exp},
+    ]
+    line, ok = _mod.summarize(results)
+    assert line == "V7: 3/4 ratings matched, 1/2 questioned"
+    assert ok is False

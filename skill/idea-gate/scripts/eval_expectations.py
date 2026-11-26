@@ -48,6 +48,9 @@ def check_run(assessment: dict, expectations: dict) -> dict:
         1 for f in insufficient_fields
         if isinstance(f.get("question"), str) and f["question"].strip()
     )
+    for f in insufficient_fields:
+        if not (isinstance(f.get("question"), str) and f["question"].strip()):
+            mismatches.append(f"{f['id']}: insufficient without question")
 
     return {
         "ratings_matched": ratings_matched,
@@ -56,3 +59,25 @@ def check_run(assessment: dict, expectations: dict) -> dict:
         "questions_total": len(insufficient_fields),
         "mismatches": mismatches,
     }
+
+
+def format_run_v7(exp: dict) -> str:
+    """Return a formatted V7 detail block for one run's expectations result."""
+    lines = [
+        f"  V7 {exp['ratings_matched']}/{exp['ratings_total']} ratings, "
+        f"{exp['questions_ok']}/{exp['questions_total']} questioned"
+    ]
+    lines.extend(f"    {m}" for m in exp["mismatches"])
+    return "\n".join(lines)
+
+
+def summarize(results: list[dict]) -> tuple[str | None, bool]:
+    """Aggregate V7 metrics across results; return (summary_line_or_None, ok)."""
+    v7_runs = [r for r in results if r.get("expectations") is not None]
+    if not v7_runs:
+        return None, True
+    rm = sum(r["expectations"]["ratings_matched"] for r in v7_runs)
+    rt = sum(r["expectations"]["ratings_total"] for r in v7_runs)
+    qo = sum(r["expectations"]["questions_ok"] for r in v7_runs)
+    qt = sum(r["expectations"]["questions_total"] for r in v7_runs)
+    return f"V7: {rm}/{rt} ratings matched, {qo}/{qt} questioned", rm == rt and qo == qt

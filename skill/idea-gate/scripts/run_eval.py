@@ -3,7 +3,6 @@
 CLI: python run_eval.py [--fixture GLOB] [--runs N] [--pairs]
 Library: from run_eval import run_eval
 """
-import argparse
 import importlib.util
 import json
 import subprocess
@@ -31,6 +30,8 @@ def _load_module(name: str, filename: str):
 _validate = _load_module("validate_assessment", "validate_assessment.py").validate
 _eval_helpers = _load_module("eval_helpers", "eval_helpers.py")
 _eval_expectations = _load_module("eval_expectations", "eval_expectations.py")
+_cli_utils = _load_module("cli_utils", "cli_utils.py")
+_eval_v4 = _load_module("eval_v4", "eval_v4.py")
 
 
 def default_runner(fixture_path: Path) -> tuple[dict, dict]:
@@ -84,6 +85,7 @@ def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
         violations = _validate(assessment, answers)
         result["passed"] = len(violations) == 0
         result["violations"] = violations
+        result["assessment"] = assessment
         exp = _eval_expectations.load_expectations(fixture_path)
         if exp is not None:
             result["expectations"] = _eval_expectations.check_run(assessment, exp)
@@ -120,7 +122,7 @@ def run_eval(
 
 
 def _report(results: list[dict]) -> int:
-    """Print per-run result lines and V1/V7 summaries; return exit code."""
+    """Print per-run result lines and V1/V7/V4 summaries; return exit code."""
     passed = 0
     for r in results:
         if r.get("error"):
@@ -138,35 +140,23 @@ def _report(results: list[dict]) -> int:
     v7_line, v7_ok = _eval_expectations.summarize(results)
     if v7_line:
         print(v7_line)
-    return 0 if passed == len(results) and v7_ok else 1
+    comparisons = _eval_v4.check_v4(results)
+    if comparisons is not None:
+        for c in comparisons:
+            diff_text = _eval_v4.format_v4(c)
+            if diff_text:
+                print(f"{c['fixture']} V4 differences:")
+                print(diff_text)
+        v4_line, v4_ok = _eval_v4.summarize_v4(comparisons)
+        print(v4_line)
+    else:
+        v4_ok = True
+    return 0 if passed == len(results) and v7_ok and v4_ok else 1
 
 
 def main() -> int:
-    from cli_utils import configure_utf8_streams
-    configure_utf8_streams()
-
-    parser = argparse.ArgumentParser(
-        description="Run idea-gate skill on fixtures and validate results."
-    )
-    parser.add_argument(
-        "--fixture",
-        default=_DEFAULT_FIXTURE_GLOB,
-        metavar="GLOB",
-        help="Glob relative to repo root (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--runs",
-        type=int,
-        default=1,
-        metavar="N",
-        help="Runs per fixture (default: %(default)s)",
-    )
-    parser.add_argument(
-        "--pairs",
-        action="store_true",
-        help="Compare language pairs from tests/fixtures/pairs.yaml",
-    )
-    args = parser.parse_args()
+    _cli_utils.configure_utf8_streams()
+    args = _cli_utils.build_eval_parser(_DEFAULT_FIXTURE_GLOB).parse_args()
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir = _EVAL_OUT_DIR / timestamp

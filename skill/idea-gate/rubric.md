@@ -39,6 +39,38 @@ The answer fails to meet the guidance. This rating applies when:
 
 ---
 
+## Uncertainty rule
+
+Apply this rule when an answer contains an estimate, a range, or an
+acknowledged gap in knowledge. It determines whether the field is
+`point_of_attention` or `insufficient`; it does not override a `sufficient`
+rating.
+
+### Explained uncertainty → `point_of_attention`
+
+Rate `point_of_attention` when the answer gives an estimate, range, or
+provisional value **and** states why the value is uncertain or when it will
+be settled.
+
+Examples:
+- "€40–60k; vendor quote expected in March" ← estimate + reason
+- "Three months, pending final scope sign-off by end of Q1" ← range + condition
+
+The `reason` names what is confirmed and what is still open.
+
+### Unexplained gap → `insufficient`
+
+Rate `insufficient` when the answer has one of these patterns:
+
+- empty or placeholder text ("TBD", "nader te bepalen")
+- uncertainty stated without an estimate ("costs are still unknown")
+- an estimate or range given without any explanation of why it is uncertain
+  or when it will be resolved
+
+A number without context is an unexplained gap if no reasoning accompanies it.
+
+---
+
 ## Picking the quote
 
 The `quote` is evidence, not a summary. Its purpose is to anchor the rating to

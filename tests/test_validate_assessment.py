@@ -37,6 +37,7 @@ def _assessment(field_overrides=None, **top):
             "rating": "sufficient",
             "quote": f"Answer text for {fid}.",
             "reason": f"The field {fid} is adequately addressed.",
+            "question": None,
         }
         for fid in _V12_BODY_FIELDS
     ]
@@ -55,7 +56,7 @@ def test_valid_v12_passes():
 
 def test_rule1_missing_field():
     fields = [
-        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok"}
+        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok", "question": None}
         for fid in _V12_BODY_FIELDS if fid != "complexity"
     ]
     violations = validate(_assessment(field_overrides=fields), _answers())
@@ -64,12 +65,12 @@ def test_rule1_missing_field():
 
 def test_rule1_duplicate_field():
     fields = [
-        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok"}
+        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok", "question": None}
         for fid in _V12_BODY_FIELDS
     ]
     fields.append(
         {"id": "background", "rating": "sufficient",
-         "quote": "Answer text for background.", "reason": "ok"}
+         "quote": "Answer text for background.", "reason": "ok", "question": None}
     )
     violations = validate(_assessment(field_overrides=fields), _answers())
     assert any("background" in v and ("2 times" in v or "duplicat" in v) for v in violations)
@@ -77,10 +78,10 @@ def test_rule1_duplicate_field():
 
 def test_rule1_unknown_field():
     fields = [
-        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok"}
+        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok", "question": None}
         for fid in _V12_BODY_FIELDS
     ]
-    fields.append({"id": "ghost_field", "rating": "sufficient", "quote": "text", "reason": "ok"})
+    fields.append({"id": "ghost_field", "rating": "sufficient", "quote": "text", "reason": "ok", "question": None})
     violations = validate(_assessment(field_overrides=fields), _answers())
     assert any("ghost_field" in v for v in violations)
 
@@ -89,7 +90,7 @@ def test_rule1_wrong_order():
     reordered = _V12_BODY_FIELDS.copy()
     reordered[0], reordered[1] = reordered[1], reordered[0]
     fields = [
-        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok"}
+        {"id": fid, "rating": "sufficient", "quote": f"Answer text for {fid}.", "reason": "ok", "question": None}
         for fid in reordered
     ]
     violations = validate(_assessment(field_overrides=fields), _answers())
@@ -160,3 +161,50 @@ def test_rule5_whitespace_only_reason():
     a["fields"][0]["reason"] = "   "
     violations = validate(a, _answers())
     assert any("rule 5" in v and "background" in v for v in violations)
+
+
+def test_rule6_missing_question_key():
+    a = _assessment()
+    del a["fields"][0]["question"]
+    violations = validate(a, _answers())
+    assert any("rule 6" in v and "background" in v and "missing" in v for v in violations)
+
+
+def test_rule6_insufficient_null_question():
+    a = _assessment()
+    a["fields"][0]["rating"] = "insufficient"
+    a["fields"][0]["question"] = None
+    violations = validate(a, _answers())
+    assert any("rule 6" in v and "background" in v for v in violations)
+
+
+def test_rule6_insufficient_empty_question():
+    a = _assessment()
+    a["fields"][0]["rating"] = "insufficient"
+    a["fields"][0]["question"] = "   "
+    violations = validate(a, _answers())
+    assert any("rule 6" in v and "background" in v for v in violations)
+
+
+def test_rule6_sufficient_non_null_question():
+    a = _assessment()
+    a["fields"][0]["question"] = "What is the purpose of this project?"
+    violations = validate(a, _answers())
+    assert any("rule 6" in v and "background" in v for v in violations)
+
+
+def test_rule6_point_of_attention_non_null_question():
+    a = _assessment()
+    a["fields"][0]["rating"] = "point_of_attention"
+    a["fields"][0]["question"] = "Can you elaborate further?"
+    violations = validate(a, _answers())
+    assert any("rule 6" in v and "background" in v for v in violations)
+
+
+def test_rule6_insufficient_with_valid_question_passes():
+    a = _assessment()
+    a["fields"][0]["rating"] = "insufficient"
+    a["fields"][0]["quote"] = "Answer text for background."
+    a["fields"][0]["question"] = "What is the background and strategic context of this project?"
+    violations = validate(a, _answers())
+    assert not any("rule 6" in v for v in violations)

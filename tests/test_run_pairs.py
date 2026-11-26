@@ -29,7 +29,7 @@ def _make_assessment(ratings: dict) -> dict:
         "template_version": "v12",
         "language": "nl",
         "fields": [
-            {"id": fid, "rating": r, "quote": "...", "reason": "..."}
+            {"id": fid, "rating": r, "quote": "...", "reason": "...", "question": None}
             for fid, r in ratings.items()
         ],
     }

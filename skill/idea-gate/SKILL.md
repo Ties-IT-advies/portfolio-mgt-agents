@@ -80,18 +80,20 @@ For each body field, following `skill/idea-gate/rubric.md`:
 1. Read the field's `guidance` from `fields.yaml`.
 2. Read the field's answer from the answers object (empty string if absent).
 3. Apply the rubric to choose a rating key: `sufficient`, `point_of_attention`,
-   or `insufficient`.
+   or `insufficient`. For answers that contain estimates, ranges, or
+   acknowledged gaps, also apply the **Uncertainty rule** in
+   `skill/idea-gate/rubric.md`.
 4. Select the **shortest verbatim excerpt** from the answer that carries the
    evidence for the rating. This is `quote`. Set `quote` to `null` only when
    the answer is empty.
 5. Write `reason` in the document's language. One to three sentences naming
    what is present or absent relative to the guidance criterion.
+6. Write `question` in the document's language. For `insufficient` ratings:
+   ask the submitter exactly what is missing. For every other rating: set
+   `question` to `null`.
 
 Store the rating as a locale key — `sufficient`, `point_of_attention`, or
 `insufficient` — never as the display string.
-
-<!-- KR 1.4 / V7 — Uncertainty rule: not yet implemented -->
-> **[KR 1.4 — pending]** Uncertainty rule pending KR 1.4.
 
 ---
 
@@ -108,7 +110,8 @@ Write the assessment to `<dir>/<stem>.assessment.json`:
       "id": "<field_id>",
       "rating": "<sufficient | point_of_attention | insufficient>",
       "quote": "<verbatim excerpt, or null>",
-      "reason": "<explanation in the document language>"
+      "reason": "<explanation in the document language>",
+      "question": "<question in the document language for insufficient; null otherwise>"
     }
   ]
 }

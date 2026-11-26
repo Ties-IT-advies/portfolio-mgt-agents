@@ -69,7 +69,7 @@ def _check_field_list(fields: list, expected_ids: list[str]) -> list[str]:
 
 
 def _check_field_entry(fid: str, entry: dict, answer: str) -> list[str]:
-    """Rules 2-5 for one field entry."""
+    """Rules 2-6 for one field entry."""
     violations = []
     rating = entry.get("rating", "")
     quote = entry.get("quote")
@@ -102,6 +102,21 @@ def _check_field_entry(fid: str, entry: dict, answer: str) -> list[str]:
 
     if not isinstance(reason, str) or not reason.strip():
         violations.append(f"rule 5: field {fid!r} has empty reason")
+
+    if "question" not in entry:
+        violations.append(f"rule 6: field {fid!r} is missing 'question' key")
+    elif rating == "insufficient":
+        question = entry["question"]
+        if not isinstance(question, str) or not question.strip():
+            violations.append(
+                f"rule 6: field {fid!r} is 'insufficient' but "
+                f"'question' must be a non-empty string"
+            )
+    else:
+        if entry["question"] is not None:
+            violations.append(
+                f"rule 6: field {fid!r} rating {rating!r} must have null question"
+            )
 
     return violations
 

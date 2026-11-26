@@ -30,6 +30,7 @@ def _load_module(name: str, filename: str):
 
 _validate = _load_module("validate_assessment", "validate_assessment.py").validate
 _eval_helpers = _load_module("eval_helpers", "eval_helpers.py")
+_eval_expectations = _load_module("eval_expectations", "eval_expectations.py")
 
 
 def default_runner(fixture_path: Path) -> tuple[dict, dict]:
@@ -76,12 +77,16 @@ def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
         "run": run_index,
         "passed": False,
         "violations": [],
+        "expectations": None,
     }
     try:
         assessment, answers = runner(fixture_path)
         violations = _validate(assessment, answers)
         result["passed"] = len(violations) == 0
         result["violations"] = violations
+        exp = _eval_expectations.load_expectations(fixture_path)
+        if exp is not None:
+            result["expectations"] = _eval_expectations.check_run(assessment, exp)
         tag = f"{fixture_path.stem}_run{run_index}"
         (out_dir / f"{tag}.assessment.json").write_text(
             json.dumps(assessment, indent=2, ensure_ascii=False), encoding="utf-8"
@@ -115,7 +120,7 @@ def run_eval(
 
 
 def _report(results: list[dict]) -> int:
-    """Print per-run result lines and V1 summary; return exit code."""
+    """Print per-run result lines and V1/V7 summaries; return exit code."""
     passed = 0
     for r in results:
         if r.get("error"):
@@ -127,9 +132,13 @@ def _report(results: list[dict]) -> int:
             n = len(r["violations"])
             line = f"FAIL {n} violation{'s' if n != 1 else ''}"
         print(f"{r['fixture']} (run {r['run']}): {line}")
-    total = len(results)
-    print(f"\nV1: {passed}/{total} runs valid")
-    return 0 if passed == total else 1
+        if r.get("expectations") is not None:
+            print(_eval_expectations.format_run_v7(r["expectations"]))
+    print(f"\nV1: {passed}/{len(results)} runs valid")
+    v7_line, v7_ok = _eval_expectations.summarize(results)
+    if v7_line:
+        print(v7_line)
+    return 0 if passed == len(results) and v7_ok else 1
 
 
 def main() -> int:

@@ -46,6 +46,10 @@ def compare_runs(fixture_runs: list[dict]) -> dict:
         ]
         if len(set(ratings)) > 1:
             field_diffs[field_id] = ratings
+    if not all_field_ids and any(r is None for r in run_ratings):
+        field_diffs["[run errors]"] = [
+            "[error]" if r is None else "ok" for r in run_ratings
+        ]
     return {
         "fixture": fixture_runs[0]["fixture"],
         "field_diffs": field_diffs,

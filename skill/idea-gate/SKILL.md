@@ -45,6 +45,9 @@ python skill/idea-gate/scripts/detect_language.py <dir>/<stem>.answers.json
 
 Capture the output as `lang` (`nl`, `en`, or `unknown`).
 
+An empty document (all answers blank or whitespace) is assessed in English:
+`detect_language.py` returns `en` automatically — no question needed.
+
 If `lang` is `unknown`, ask the user:
 > "Could not detect the document language automatically. Is this English (`en`) or Dutch (`nl`)?"
 

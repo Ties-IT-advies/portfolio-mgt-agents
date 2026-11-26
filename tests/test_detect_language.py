@@ -56,15 +56,26 @@ def test_detect_mixed_returns_unknown():
     assert mod.detect_language(mixed) == "unknown"
 
 
-def test_detect_empty_returns_unknown():
-    assert mod.detect_language("") == "unknown"
+def test_detect_empty_returns_en():
+    # Empty document has no language; English is canonical per DEC-008.
+    assert mod.detect_language("") == "en"
+
+
+def test_detect_whitespace_only_returns_en():
+    # Whitespace-only text tokenizes to zero words — same rule as empty.
+    assert mod.detect_language("   \t\n  ") == "en"
+
+
+def test_detect_short_nonzero_text_returns_unknown():
+    # Fewer than MIN_WORD_COUNT words but not zero: still unknown.
+    assert mod.detect_language("Short text here.") == "unknown"
 
 
 def test_diacritic_word_not_split_into_stop_word():
-    # With [a-z]+ tokenizer "Creëer" splits into ["cre", "er"]; "er" is a
+    # With [a-z]+ tokenizer "Creër" splits into ["cre", "er"]; "er" is a
     # Dutch stop-word, producing a false Dutch detection. With [^\W\d_]+
     # the whole word is kept as one token and no stop-word is hit.
-    text = " ".join(["Creëer"] * 15)
+    text = " ".join(["Creër"] * 15)
     assert mod.detect_language(text) == "unknown"
 
 
@@ -74,6 +85,11 @@ def test_resolve_override_wins_over_dutch_detection():
 
 def test_resolve_override_wins_over_english_detection():
     assert mod.resolve_language(ENGLISH_TEXT, override="nl") == "nl"
+
+
+def test_resolve_override_wins_over_empty_text():
+    # Override must beat the empty-document default too.
+    assert mod.resolve_language("", override="nl") == "nl"
 
 
 def test_resolve_no_override_detects_dutch():
@@ -112,6 +128,20 @@ def test_cli_override_en(tmp_path):
     p.write_text(json.dumps(answers), encoding="utf-8")
     result = subprocess.run(
         ["python", str(_SCRIPTS / "detect_language.py"), str(p), "--override", "en"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert result.stdout.strip() == "en"
+
+
+def test_cli_all_empty_answers_returns_en(tmp_path):
+    # Blank fixture: every field is empty or whitespace — must return en.
+    answers = {"fields": {"field1": "", "field2": "   ", "field3": ""}}
+    p = tmp_path / "test.answers.json"
+    p.write_text(json.dumps(answers), encoding="utf-8")
+    result = subprocess.run(
+        ["python", str(_SCRIPTS / "detect_language.py"), str(p)],
         capture_output=True,
         text=True,
     )

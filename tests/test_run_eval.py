@@ -39,6 +39,7 @@ def _valid_pair():
                 "rating": "sufficient",
                 "quote": f"Answer for {fid}.",
                 "reason": f"Field {fid} is adequately addressed.",
+                "question": None,
             }
             for fid in _V12_FIELDS
         ],

@@ -1,6 +1,6 @@
 # Assessment format
 
-One assessment per submitted project idea. The five validation rules are enforced by `scripts/validate_assessment.py`.
+One assessment per submitted project idea. The six validation rules are enforced by `scripts/validate_assessment.py`.
 
 ## Top-level keys
 
@@ -18,6 +18,7 @@ One assessment per submitted project idea. The five validation rules are enforce
 | `rating` | string | One of `sufficient`, `point_of_attention`, `insufficient` (the `ratings.*` locale keys) |
 | `quote` | string or null | Verbatim excerpt of that field's own answer; `null` only when the answer is empty |
 | `reason` | string | Non-empty explanation written in `language` |
+| `question` | string or null | For `insufficient`: non-empty question in `language` asking the submitter what is missing. For every other rating: `null`. |
 
 ## Answers input
 
@@ -38,3 +39,4 @@ The validator takes a second file — the reader output — with format:
 3. **Verbatim quote:** After collapsing whitespace and trimming, `quote` is a substring of **that field's own** answer, not of another field's. Case-sensitive.
 4. **Quote and answer agreement:** Empty answer (after trimming) → `rating` must be `insufficient`, `quote` must be `null`. Non-empty answer → `quote` must be a non-empty string.
 5. **Non-empty reason:** `reason` must be a non-empty, non-whitespace string.
+6. **Question field:** `question` key must be present on every field entry. For `insufficient`: `question` must be a non-empty string. For every other rating: `question` must be `null`.

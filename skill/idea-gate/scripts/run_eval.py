@@ -30,6 +30,7 @@ def _load_module(name: str, filename: str):
 
 _validate = _load_module("validate_assessment", "validate_assessment.py").validate
 _eval_helpers = _load_module("eval_helpers", "eval_helpers.py")
+_eval_expectations = _load_module("eval_expectations", "eval_expectations.py")
 
 
 def default_runner(fixture_path: Path) -> tuple[dict, dict]:
@@ -76,12 +77,16 @@ def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
         "run": run_index,
         "passed": False,
         "violations": [],
+        "expectations": None,
     }
     try:
         assessment, answers = runner(fixture_path)
         violations = _validate(assessment, answers)
         result["passed"] = len(violations) == 0
         result["violations"] = violations
+        exp = _eval_expectations.load_expectations(fixture_path)
+        if exp is not None:
+            result["expectations"] = _eval_expectations.check_run(assessment, exp)
         tag = f"{fixture_path.stem}_run{run_index}"
         (out_dir / f"{tag}.assessment.json").write_text(
             json.dumps(assessment, indent=2, ensure_ascii=False), encoding="utf-8"
@@ -115,7 +120,7 @@ def run_eval(
 
 
 def _report(results: list[dict]) -> int:
-    """Print per-run result lines and V1 summary; return exit code."""
+    """Print per-run result lines and V1/V7 summaries; return exit code."""
     passed = 0
     for r in results:
         if r.get("error"):
@@ -127,9 +132,26 @@ def _report(results: list[dict]) -> int:
             n = len(r["violations"])
             line = f"FAIL {n} violation{'s' if n != 1 else ''}"
         print(f"{r['fixture']} (run {r['run']}): {line}")
+        exp = r.get("expectations")
+        if exp is not None:
+            print(
+                f"  V7 {exp['ratings_matched']}/{exp['ratings_total']} ratings, "
+                f"{exp['questions_ok']}/{exp['questions_total']} questioned"
+            )
+            for m in exp["mismatches"]:
+                print(f"    {m}")
     total = len(results)
     print(f"\nV1: {passed}/{total} runs valid")
-    return 0 if passed == total else 1
+    v7_runs = [r for r in results if r.get("expectations") is not None]
+    v7_ok = True
+    if v7_runs:
+        rm = sum(r["expectations"]["ratings_matched"] for r in v7_runs)
+        rt = sum(r["expectations"]["ratings_total"] for r in v7_runs)
+        qo = sum(r["expectations"]["questions_ok"] for r in v7_runs)
+        qt = sum(r["expectations"]["questions_total"] for r in v7_runs)
+        print(f"V7: {rm}/{rt} ratings matched, {qo}/{qt} questioned")
+        v7_ok = rm == rt and qo == qt
+    return 0 if passed == total and v7_ok else 1
 
 
 def main() -> int:

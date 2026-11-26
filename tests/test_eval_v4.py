@@ -150,3 +150,33 @@ def test_format_v4_with_field_diff():
     }
     result = _mod.format_v4(comparison)
     assert "budget: sufficient / point_of_attention / insufficient" in result
+
+
+def test_all_runs_errored_counts_as_difference():
+    """All runs errored (no assessment) → fixture counts as 1 difference via [run errors]."""
+    runs = [_make_result("a.docx", i, None, error="timeout") for i in range(1, 4)]
+    comparison = _mod.compare_runs(runs)
+    assert "[run errors]" in comparison["field_diffs"]
+    assert comparison["field_diffs"]["[run errors]"] == ["[error]", "[error]", "[error]"]
+
+
+def test_all_runs_errored_shown_in_format_output():
+    """format_v4 includes [run errors] line when all runs errored."""
+    runs = [_make_result("a.docx", i, None, error="timeout") for i in range(1, 3)]
+    comparison = _mod.compare_runs(runs)
+    output = _mod.format_v4(comparison)
+    assert "[run errors]" in output
+    assert "[error]" in output
+
+
+def test_one_of_three_runs_errored_no_run_errors_key():
+    """When one of three runs errored and field ids exist, [run errors] key is not added."""
+    runs = [
+        _make_result("a.docx", 1, _make_assessment({"budget": "sufficient"})),
+        _make_result("a.docx", 2, None, error="timeout"),
+        _make_result("a.docx", 3, _make_assessment({"budget": "sufficient"})),
+    ]
+    comparison = _mod.compare_runs(runs)
+    assert "[run errors]" not in comparison["field_diffs"]
+    assert "budget" in comparison["field_diffs"]
+    assert comparison["field_diffs"]["budget"] == ["sufficient", "[error]", "sufficient"]

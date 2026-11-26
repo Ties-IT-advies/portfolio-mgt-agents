@@ -61,10 +61,15 @@ def detect_language(text: str) -> str:
     Pass only the submitter's free-text answers. Field labels and template
     guidance text must be excluded before calling this function.
 
-    Returns "unknown" when the text has fewer than MIN_WORD_COUNT words, or
-    when neither language's stop-word count clearly dominates.
+    Returns "en" when the text contains no words (empty document rule: an
+    empty document has no language; English is canonical per DEC-008).
+    Returns "unknown" when the text has at least one word but fewer than
+    MIN_WORD_COUNT, or when neither language's stop-word count clearly
+    dominates.
     """
     words = _tokenize(text)
+    if len(words) == 0:
+        return "en"
     if len(words) < MIN_WORD_COUNT:
         return "unknown"
 

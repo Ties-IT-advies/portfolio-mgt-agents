@@ -212,6 +212,25 @@ Promote the Project Idea Submission Template to v12 by adding three fields (`str
 
 ---
 
+## Entry 8
+
+**Decision ID:** DEC-008
+**Topic:** Language Detection — Empty Document Default
+**Status:** Approved (2026-11-26)
+
+**Decision Made:**
+When all answers in a submitted Project Idea document are empty or whitespace, `detect_language.py` returns `en` (English) instead of `unknown`.
+
+**Options Considered:**
+- Return `unknown` and require a user response — Denied (breaks headless `./eval` on blank fixtures; no one is present to answer the prompt)
+- Default to `nl` — Denied (English is the canonical assessment language under KR 1.7; an empty document carries no language signal)
+- **Return `en` for zero-word documents; keep `unknown` for short-but-non-empty text — CHOSEN**
+
+**Rationale:**
+An empty document has no language. English is the canonical assessment language under KR 1.7. Returning `unknown` on an empty document stopped the headless `./eval` harness because no one is present to answer the language prompt. The rule is encoded in `detect_language.py` — not only in `SKILL.md` — so it is deterministic and testable without model calls. Short documents with some text but fewer than `MIN_WORD_COUNT` words still return `unknown`, since the submitter's intent cannot be inferred from insufficient evidence.
+
+---
+
 ## Open Items Carried Forward
 
 These are not yet decided and should be resolved before or during early development:

@@ -223,7 +223,7 @@ When all answers in a submitted Project Idea document are empty or whitespace, `
 
 **Options Considered:**
 - Return `unknown` and require a user response — Denied (breaks headless `./eval` on blank fixtures; no one is present to answer the prompt)
-- Default to `nl` (the most common submission language) — Denied (English is the canonical assessment language under KR 1.7; an empty fixture carries no language signal)
+- Default to `nl` — Denied (English is the canonical assessment language under KR 1.7; an empty document carries no language signal)
 - **Return `en` for zero-word documents; keep `unknown` for short-but-non-empty text — CHOSEN**
 
 **Rationale:**

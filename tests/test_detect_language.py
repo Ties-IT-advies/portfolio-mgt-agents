@@ -72,10 +72,10 @@ def test_detect_short_nonzero_text_returns_unknown():
 
 
 def test_diacritic_word_not_split_into_stop_word():
-    # With [a-z]+ tokenizer "Creër" splits into ["cre", "er"]; "er" is a
+    # With [a-z]+ tokenizer "Creëer" splits into ["cre", "er"]; "er" is a
     # Dutch stop-word, producing a false Dutch detection. With [^\W\d_]+
     # the whole word is kept as one token and no stop-word is hit.
-    text = " ".join(["Creër"] * 15)
+    text = " ".join(["Creëer"] * 15)
     assert mod.detect_language(text) == "unknown"
 
 

@@ -231,6 +231,28 @@ An empty document has no language. English is the canonical assessment language 
 
 ---
 
+## Entry 9
+
+**Decision ID:** DEC-009
+**Topic:** `./eval` default model, lean headless setup, and usage measurement
+**Status:** Approved (2026-11-26)
+
+**Decision Made:**
+`./eval` runs on **Sonnet** by default via `--model sonnet`. The `claude` call includes `--strict-mcp-config` (no MCP servers) and `--setting-sources project,local` (no user-level plugins or settings). Usage fields (`num_turns`, input/output/cache tokens, `total_cost_usd`) are captured from each run's JSON output and stored in `report.json` and printed in the console report.
+
+**Options Considered:**
+- Keep existing default (Opus or whatever the user's default is) — Denied (each run consumes a disproportionate share of PM daily quota; no production model to match since PM does not currently assess with Claude)
+- Use `--bare` for truly clean headless execution — Denied (requires an API key and ignores the PM's login — DEC-007)
+- **Sonnet default with lean flags (`--strict-mcp-config`, `--setting-sources project,local`) — CHOSEN**
+
+**Rationale:**
+- **Cost.** `./eval` calls `claude -p` once per fixture per run. With the user's full setup (plugins, MCP servers, skill listings), every turn re-sends that context unnecessarily. Sonnet is significantly cheaper than Opus and sufficient for deterministic assessment tasks.
+- **Clean environment.** The idea-gate skill lives in `.claude/skills/idea-gate/`; it loads from the project skill directory. User-level plugins and MCP servers are not needed and add noise. `--setting-sources project,local` preserves project and local config (including the skill) while stripping user-level config. `--strict-mcp-config` prevents MCP server initialization.
+- **Visibility.** Usage was already available in the JSON output but not surfaced. Per-run and total token counts expose the actual cost of each eval run, making it easy to judge whether further model or flag changes are warranted.
+- **Override.** `./eval --model <name>` overrides the default for one-off comparisons without changing the default.
+
+---
+
 ## Open Items Carried Forward
 
 These are not yet decided and should be resolved before or during early development:

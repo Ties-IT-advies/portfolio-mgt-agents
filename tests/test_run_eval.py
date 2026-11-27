@@ -237,3 +237,81 @@ def test_default_runner_missing_files_includes_result_and_denials(tmp_path, monk
     msg = str(exc_info.value)
     assert "I tried to write the file but could not." in msg
     assert "extract_idea.py foo.docx --out foo.answers.json" in msg
+
+
+def test_default_runner_uses_lean_flags(tmp_path, monkeypatch):
+    """default_runner passes --model sonnet, --strict-mcp-config, --setting-sources."""
+    fixture = tmp_path / "idea-v12-sample.docx"
+    fixture.touch()
+    captured = []
+
+    class _FakeResult:
+        returncode = 1
+        stderr = "err"
+        stdout = ""
+
+    def _fake_run(cmd, **kwargs):
+        captured.append(list(cmd))
+        return _FakeResult()
+
+    monkeypatch.setattr(_mod.subprocess, "run", _fake_run)
+
+    with pytest.raises(RuntimeError):
+        _mod.default_runner(fixture)
+
+    cmd = captured[0]
+    assert "--model" in cmd
+    assert cmd[cmd.index("--model") + 1] == "sonnet"
+    assert "--strict-mcp-config" in cmd
+    assert "--setting-sources" in cmd
+    assert "project,local" in cmd
+
+
+def test_run_one_stores_usage_from_runner(tmp_path):
+    """Usage returned by runner is stored in the result record."""
+    usage = {"num_turns": 3, "input_tokens": 500, "output_tokens": 200}
+
+    def runner_with_usage(_path):
+        assessment, answers = _valid_pair()
+        return assessment, answers, usage
+
+    results = _mod.run_eval(
+        [Path("dummy.docx")], 1, runner=runner_with_usage, out_dir=tmp_path
+    )
+
+    assert results[0]["usage"] == usage
+
+
+def test_run_one_missing_usage_stored_as_none(tmp_path):
+    """Runner returning 2-tuple results in usage=None in the record."""
+    def runner_no_usage(_path):
+        return _valid_pair()
+
+    results = _mod.run_eval(
+        [Path("dummy.docx")], 1, runner=runner_no_usage, out_dir=tmp_path
+    )
+
+    assert results[0].get("usage") is None
+
+
+def test_report_prints_usage_total(capsys):
+    """_report prints a Usage: line at the end."""
+    results = [
+        {
+            "fixture": "a.docx", "run": 1, "passed": True, "violations": [],
+            "usage": {"num_turns": 2, "input_tokens": 400, "output_tokens": 100},
+        },
+    ]
+    _mod._report(results)
+    out = capsys.readouterr().out
+    assert "Usage:" in out
+
+
+def test_report_usage_unavailable_when_missing(capsys):
+    """_report prints 'usage unavailable' per run when usage is None."""
+    results = [
+        {"fixture": "a.docx", "run": 1, "passed": True, "violations": [], "usage": None},
+    ]
+    _mod._report(results)
+    out = capsys.readouterr().out
+    assert "usage unavailable" in out

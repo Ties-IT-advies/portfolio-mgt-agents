@@ -2,6 +2,8 @@
 import argparse
 import sys
 
+_DEFAULT_MODEL = "sonnet"
+
 
 def configure_utf8_streams() -> None:
     """Force stdout and stderr to UTF-8 regardless of terminal locale."""
@@ -31,5 +33,11 @@ def build_eval_parser(default_fixture_glob: str) -> argparse.ArgumentParser:
         "--pairs",
         action="store_true",
         help="Compare language pairs from tests/fixtures/pairs.yaml",
+    )
+    parser.add_argument(
+        "--model",
+        default=_DEFAULT_MODEL,
+        metavar="NAME",
+        help="Claude model to use (default: %(default)s)",
     )
     return parser

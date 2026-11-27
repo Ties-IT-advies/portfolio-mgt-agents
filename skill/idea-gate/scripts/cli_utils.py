@@ -2,8 +2,6 @@
 import argparse
 import sys
 
-_DEFAULT_MODEL = "sonnet"
-
 
 def configure_utf8_streams() -> None:
     """Force stdout and stderr to UTF-8 regardless of terminal locale."""
@@ -11,7 +9,7 @@ def configure_utf8_streams() -> None:
     sys.stderr.reconfigure(encoding="utf-8")
 
 
-def build_eval_parser(default_fixture_glob: str) -> argparse.ArgumentParser:
+def build_eval_parser(default_fixture_glob: str, default_model: str) -> argparse.ArgumentParser:
     """Build and return the argument parser for run_eval."""
     parser = argparse.ArgumentParser(
         description="Run idea-gate skill on fixtures and validate results."
@@ -36,7 +34,7 @@ def build_eval_parser(default_fixture_glob: str) -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--model",
-        default=_DEFAULT_MODEL,
+        default=default_model,
         metavar="NAME",
         help="Claude model to use (default: %(default)s)",
     )

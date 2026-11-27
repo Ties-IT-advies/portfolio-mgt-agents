@@ -315,3 +315,32 @@ def test_report_usage_unavailable_when_missing(capsys):
     _mod._report(results)
     out = capsys.readouterr().out
     assert "usage unavailable" in out
+
+
+def test_pairs_runner_uses_model_arg(tmp_path, monkeypatch):
+    """In --pairs mode, runner calls _run_claude with the --model argument."""
+    import sys
+
+    captured_models = []
+
+    def fake_run_claude(fixture_path, model):
+        captured_models.append(model)
+        return {"template_version": "v12", "language": "en", "fields": []}, {}, None
+
+    monkeypatch.setattr(_mod, "_run_claude", fake_run_claude)
+    monkeypatch.setattr(_mod._cli_utils, "configure_utf8_streams", lambda: None)
+
+    fixtures_dir = tmp_path / "tests" / "fixtures"
+    fixtures_dir.mkdir(parents=True)
+    (fixtures_dir / "pairs.yaml").write_text(
+        "pairs:\n  - nl: a.docx\n    en: b.docx\n"
+    )
+
+    monkeypatch.setattr(_mod, "_REPO_ROOT", tmp_path)
+    monkeypatch.setattr(_mod, "_EVAL_OUT_DIR", tmp_path / ".eval-out")
+
+    monkeypatch.setattr(sys, "argv", ["run_eval", "--pairs", "--model", "opus"])
+    _mod.main()
+
+    assert captured_models, "runner was never called"
+    assert all(m == "opus" for m in captured_models)

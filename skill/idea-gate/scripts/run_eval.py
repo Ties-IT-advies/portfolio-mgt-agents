@@ -164,17 +164,20 @@ def _report(results: list[dict]) -> int:
 
 def main() -> int:
     _cli_utils.configure_utf8_streams()
-    args = _cli_utils.build_eval_parser(_DEFAULT_FIXTURE_GLOB).parse_args()
+    args = _cli_utils.build_eval_parser(_DEFAULT_FIXTURE_GLOB, _eval_runner.DEFAULT_MODEL).parse_args()
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir = _EVAL_OUT_DIR / timestamp
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    runner = lambda path: _run_claude(path, args.model)
+    print(f"Model: {args.model}")
+
     if args.pairs:
         rp = _eval_helpers.load_run_pairs()
         pairs_path = _REPO_ROOT / "tests" / "fixtures" / "pairs.yaml"
         pairs = rp.load_pairs(pairs_path)
-        results = rp.run_pairs(pairs, default_runner, out_dir)
+        results = rp.run_pairs(pairs, runner, out_dir)
         (out_dir / "pairs-report.json").write_text(
             json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -184,10 +187,9 @@ def main() -> int:
     if not fixture_paths:
         print(f"No fixtures found for: {args.fixture}", file=sys.stderr)
         return 1
-    print(f"Model: {args.model}")
     results = run_eval(
         fixture_paths, args.runs,
-        runner=lambda path: _run_claude(path, args.model),
+        runner=runner,
         out_dir=out_dir,
     )
     (out_dir / "report.json").write_text(

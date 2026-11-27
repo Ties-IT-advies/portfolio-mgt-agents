@@ -48,8 +48,9 @@ def _write_pair_outputs(pair: dict, nl_assessment: dict, en_assessment: dict, ou
 def _run_pair(pair: dict, fixture_dir: Path, out_dir: Path, runner: Callable) -> dict:
     result = {"nl": pair["nl"], "en": pair["en"], "mismatches": [], "error": None}
     try:
-        assessment_nl, _ = runner(fixture_dir / pair["nl"])
-        assessment_en, _ = runner(fixture_dir / pair["en"])
+        raw_nl = runner(fixture_dir / pair["nl"])
+        raw_en = runner(fixture_dir / pair["en"])
+        assessment_nl, assessment_en = raw_nl[0], raw_en[0]
         result["mismatches"] = compare_ratings(assessment_nl, assessment_en)
         _write_pair_outputs(pair, assessment_nl, assessment_en, out_dir)
     except Exception as exc:

@@ -1,6 +1,5 @@
 """Evaluate the idea-gate skill on fixture .docx files.
-
-CLI: python run_eval.py [--fixture GLOB] [--runs N] [--pairs]
+CLI: python run_eval.py [--fixture GLOB] [--runs N] [--pairs] [--model NAME]
 Library: from run_eval import run_eval
 """
 import importlib.util
@@ -15,7 +14,6 @@ _REPO_ROOT = Path(__file__).parent.parent.parent.parent
 _DEFAULT_FIXTURE_GLOB = "tests/fixtures/*.docx"
 _EVAL_OUT_DIR = _REPO_ROOT / ".eval-out"
 _RUN_TIMEOUT_S = 600
-_ALLOWED_TOOLS = "Read,Write,Bash(python skill/idea-gate/scripts/*)"
 
 
 def _load_module(name: str, filename: str):
@@ -32,10 +30,11 @@ _eval_helpers = _load_module("eval_helpers", "eval_helpers.py")
 _eval_expectations = _load_module("eval_expectations", "eval_expectations.py")
 _cli_utils = _load_module("cli_utils", "cli_utils.py")
 _eval_v4 = _load_module("eval_v4", "eval_v4.py")
+_eval_runner = _load_module("eval_runner", "eval_runner.py")
 
 
-def default_runner(fixture_path: Path) -> tuple[dict, dict]:
-    """Call claude headless on fixture_path; return (assessment, answers)."""
+def _run_claude(fixture_path: Path, model: str) -> tuple:
+    """Call claude headless on fixture_path; return (assessment, answers, usage)."""
     stem = fixture_path.stem
     assessment_path = fixture_path.parent / f"{stem}.assessment.json"
     answers_path = fixture_path.parent / f"{stem}.answers.json"
@@ -43,11 +42,7 @@ def default_runner(fixture_path: Path) -> tuple[dict, dict]:
     answers_path.unlink(missing_ok=True)
     try:
         result = subprocess.run(
-            [
-                "claude", "-p", f"Assess {fixture_path}",
-                "--output-format", "json",
-                "--allowedTools", _ALLOWED_TOOLS,
-            ],
+            _eval_runner.build_claude_command(fixture_path, model),
             capture_output=True,
             text=True,
             stdin=subprocess.DEVNULL,
@@ -68,11 +63,18 @@ def default_runner(fixture_path: Path) -> tuple[dict, dict]:
         assessment = json.load(f)
     with answers_path.open(encoding="utf-8") as f:
         answers = json.load(f)
-    return assessment, answers
+    try:
+        usage = _eval_runner.parse_usage(json.loads(result.stdout))
+    except (json.JSONDecodeError, ValueError):
+        usage = None
+    return assessment, answers, usage
+
+
+def default_runner(fixture_path: Path) -> tuple:
+    return _run_claude(fixture_path, _eval_runner.DEFAULT_MODEL)
 
 
 def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
-    """Run the model once on fixture_path; return a result record."""
     result = {
         "fixture": fixture_path.name,
         "run": run_index,
@@ -81,7 +83,8 @@ def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
         "expectations": None,
     }
     try:
-        assessment, answers = runner(fixture_path)
+        assessment, answers, *rest = runner(fixture_path)
+        result["usage"] = rest[0] if rest else None
         violations = _validate(assessment, answers)
         result["passed"] = len(violations) == 0
         result["violations"] = violations
@@ -134,6 +137,8 @@ def _report(results: list[dict]) -> int:
             n = len(r["violations"])
             line = f"FAIL {n} violation{'s' if n != 1 else ''}"
         print(f"{r['fixture']} (run {r['run']}): {line}")
+        if not r.get("error"):
+            print(f"  {_eval_runner.format_usage(r.get('usage')) or 'usage unavailable'}")
         if r.get("expectations") is not None:
             print(_eval_expectations.format_run_v7(r["expectations"]))
     print(f"\nV1: {passed}/{len(results)} runs valid")
@@ -151,22 +156,26 @@ def _report(results: list[dict]) -> int:
         print(v4_line)
     else:
         v4_ok = True
+    print(f"\nUsage: {_eval_runner.format_usage(_eval_runner.total_usage([r.get('usage') for r in results])) or 'unavailable'}")
     return 0 if passed == len(results) and v7_ok and v4_ok else 1
 
 
 def main() -> int:
     _cli_utils.configure_utf8_streams()
-    args = _cli_utils.build_eval_parser(_DEFAULT_FIXTURE_GLOB).parse_args()
+    args = _cli_utils.build_eval_parser(_DEFAULT_FIXTURE_GLOB, _eval_runner.DEFAULT_MODEL).parse_args()
 
     timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     out_dir = _EVAL_OUT_DIR / timestamp
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    runner = lambda path: _run_claude(path, args.model)
+    print(f"Model: {args.model}")
+
     if args.pairs:
         rp = _eval_helpers.load_run_pairs()
         pairs_path = _REPO_ROOT / "tests" / "fixtures" / "pairs.yaml"
         pairs = rp.load_pairs(pairs_path)
-        results = rp.run_pairs(pairs, default_runner, out_dir)
+        results = rp.run_pairs(pairs, runner, out_dir)
         (out_dir / "pairs-report.json").write_text(
             json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
         )
@@ -176,13 +185,14 @@ def main() -> int:
     if not fixture_paths:
         print(f"No fixtures found for: {args.fixture}", file=sys.stderr)
         return 1
-
-    results = run_eval(fixture_paths, args.runs, out_dir=out_dir)
-
+    results = run_eval(
+        fixture_paths, args.runs,
+        runner=runner,
+        out_dir=out_dir,
+    )
     (out_dir / "report.json").write_text(
         json.dumps(results, indent=2, ensure_ascii=False), encoding="utf-8"
     )
-
     return _report(results)
 
 

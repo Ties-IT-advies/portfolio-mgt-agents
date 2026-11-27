@@ -9,7 +9,7 @@ def configure_utf8_streams() -> None:
     sys.stderr.reconfigure(encoding="utf-8")
 
 
-def build_eval_parser(default_fixture_glob: str) -> argparse.ArgumentParser:
+def build_eval_parser(default_fixture_glob: str, default_model: str) -> argparse.ArgumentParser:
     """Build and return the argument parser for run_eval."""
     parser = argparse.ArgumentParser(
         description="Run idea-gate skill on fixtures and validate results."
@@ -31,5 +31,11 @@ def build_eval_parser(default_fixture_glob: str) -> argparse.ArgumentParser:
         "--pairs",
         action="store_true",
         help="Compare language pairs from tests/fixtures/pairs.yaml",
+    )
+    parser.add_argument(
+        "--model",
+        default=default_model,
+        metavar="NAME",
+        help="Claude model to use (default: %(default)s)",
     )
     return parser

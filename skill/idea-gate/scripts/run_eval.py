@@ -71,12 +71,10 @@ def _run_claude(fixture_path: Path, model: str) -> tuple:
 
 
 def default_runner(fixture_path: Path) -> tuple:
-    """Call claude with the default model; return (assessment, answers, usage)."""
     return _run_claude(fixture_path, _eval_runner.DEFAULT_MODEL)
 
 
 def _run_one(fixture_path: Path, run_index: int, out_dir: Path, runner) -> dict:
-    """Run the model once on fixture_path; return a result record."""
     result = {
         "fixture": fixture_path.name,
         "run": run_index,

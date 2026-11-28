@@ -1,4 +1,4 @@
-"""Generate v12 Project Idea .docx fixtures from the field registry and locale files."""
+"""Generate Project Idea .docx fixtures from the field registry and locale files."""
 
 import datetime
 import io
@@ -27,8 +27,8 @@ def load_yaml(path):
         return yaml.safe_load(f)
 
 
-def get_v12_fields(registry, section):
-    return [f for f in registry if f["section"] == section and "v12" in f["versions"]]
+def get_fields_for_version(registry, section, version):
+    return [f for f in registry if f["section"] == section and version in f["versions"]]
 
 
 def set_core_properties(doc):
@@ -67,9 +67,9 @@ def build_strategic_contribution(locale_fields, picks):
     return "\n".join(lines)
 
 
-def build_document(registry, locale, project_name, header_values, body_values, title_prefix="Project IDEE:"):
-    header_fields = get_v12_fields(registry, "header")
-    body_fields = get_v12_fields(registry, "body")
+def build_document(registry, locale, project_name, header_values, body_values, title_prefix="Project IDEE:", version="v12"):
+    header_fields = get_fields_for_version(registry, "header", version)
+    body_fields = get_fields_for_version(registry, "body", version)
     doc = Document()
     set_core_properties(doc)
     add_title(doc, project_name, title_prefix)
@@ -103,6 +103,7 @@ def save_deterministic(doc, path):
 
 
 def build_sample_document(registry, locale, sample, title_prefix="Project IDEE:"):
+    version = sample.get("version", "v12")
     picks = [
         (p["objective"], p["index"], p.get("explanation", ""))
         for p in sample.get("strategic_picks", [])
@@ -117,6 +118,7 @@ def build_sample_document(registry, locale, sample, title_prefix="Project IDEE:"
         sample.get("header", {}),
         body,
         title_prefix,
+        version=version,
     )
 
 
@@ -134,7 +136,9 @@ def main():
         locale = load_yaml(_LOCALE_DIR / f"{locale_code}.yaml")["fields"]
         title_prefix = _TITLE_PREFIXES.get(locale_code, "Project IDEE:")
         doc = build_sample_document(registry, locale, sample, title_prefix)
-        out_name = f"idea-v12-{sample_path.stem}.docx"
+        version = sample.get("version", "v12")
+        out_stem = sample.get("name", sample_path.stem)
+        out_name = f"idea-{version}-{out_stem}.docx"
         save_deterministic(doc, OUT_DIR / out_name)
         generated.append(out_name)
 

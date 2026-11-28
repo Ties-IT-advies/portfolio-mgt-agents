@@ -1,0 +1,22 @@
+# Sample: strong v9 — fully completed idea with measures, individual sponsor and three mitigated risks (v9 template).
+version: v9
+name: sample-en
+locale: en
+project_name: "Smart Inventory Management"
+header:
+  prepared_by: "K. van der Berg, Project Manager"
+  date: "2024-03-01"
+  status: "Concept"
+body:
+  background: "Current inventory management at Verbogen BV relies entirely on manual Excel-based tracking, leading to chronic over- and under-stocking. This costs approximately €120,000 annually in write-offs and emergency deliveries. A smart inventory management system with automatic replenishment eliminates the root cause."
+  objective: "Objective: reduce stock write-offs above 10% to zero within 12 months post go-live. Success measure: average stock level reduced by 20%, emergency deliveries down by 90%."
+  sponsor: "P. Jansen, Director of Operations"
+  people_involved: "Project Manager: T. Visser (IT). Subject-matter expert: W. Mols (Logistics). Content owner: W. Mols."
+  costs: "Internal capacity: 480 hours over 8 months (IT analyst + logistics advisor). Project costs: €65,000 realisation, €10,000/year maintenance. Assumption: inventory management SaaS licence €18,000/year."
+  budget: "€83,000 available from the operational improvement fund. CFO approval received 15-02-2024."
+  benefits: "€120,000/year savings on write-offs and emergency deliveries. Order lead time reduced by 30%. Downside: initial resistance from Logistics team transitioning from Excel."
+  timelines: "Start: April 2024. Milestones: system selection May 2024, implementation August 2024, go-live October 2024. Confidence level: medium — dependent on vendor selection."
+  risks: |-
+    1. ERP integration failure — mitigation: thorough technical analysis in phase 1, manual fallback; owner: T. Visser.
+    2. Low adoption by logistics team — mitigation: training programme + change manager engaged; owner: W. Mols.
+    3. Data quality issues during migration — mitigation: data quality audit before go-live; owner: T. Visser.

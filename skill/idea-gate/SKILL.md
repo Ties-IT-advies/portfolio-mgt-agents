@@ -63,13 +63,13 @@ Use the final output as `language` in the assessment.
 
 ## Step 3 — Determine template version
 
-<!-- KR 1.5 — Template-version detection: not yet implemented -->
-> **[KR 1.5 — pending]** Full template-version detection logic is pending KR 1.5.
+Run:
 
-**Interim rule:** Inspect the extracted `fields` dict. If all three v12-only
-field ids (`strategic_contribution`, `departments_involved`, `complexity`) are
-present as keys (regardless of whether their values are empty), use `"v12"`.
-Otherwise use `"v9"`.
+```bash
+python skill/idea-gate/scripts/detect_version.py <dir>/<stem>.answers.json
+```
+
+Capture the output as `template_version` (`v9` or `v12`).
 
 ---
 
